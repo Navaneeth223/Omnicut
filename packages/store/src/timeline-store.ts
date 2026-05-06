@@ -30,6 +30,16 @@ interface TimelineState {
   scrollPosition: number;
   /** Ripple edit mode enabled */
   rippleMode: boolean;
+  /** Transitions between clips */
+  transitions: Array<{
+    id: string;
+    type: string;
+    name: string;
+    duration: number;
+    fromClipId: string;
+    toClipId: string;
+    alignment: 'start' | 'center' | 'end';
+  }>;
 }
 
 /**
@@ -120,6 +130,14 @@ interface TimelineActions {
   splitClip: (clipId: string, splitTime: number) => void;
   /** Split all clips at playhead */
   splitClipsAtPlayhead: () => void;
+  /** Add transition between clips */
+  addTransition: (fromClipId: string, toClipId: string, type: string, duration: number) => void;
+  /** Remove transition */
+  removeTransition: (transitionId: string) => void;
+  /** Update transition */
+  updateTransition: (transitionId: string, updates: Partial<any>) => void;
+  /** Get transitions */
+  getTransitions: () => any[];
 }
 
 /**
@@ -137,6 +155,7 @@ export const useTimelineStore = create<TimelineState & TimelineActions>()(
     zoomLevel: 100, // pixels per second
     scrollPosition: 0,
     rippleMode: false,
+    transitions: [],
 
     // Actions
     initTimeline: (timeline: Timeline) => {
@@ -776,8 +795,65 @@ export const useTimelineStore = create<TimelineState & TimelineActions>()(
         console.log(`Split ${clipsToSplit.length} clip(s) at playhead (${playhead.toFixed(2)}s)`);
       }
     },
+
+    addTransition: (fromClipId: string, toClipId: string, type: string, duration: number = 1) => {
+      set((state) => {
+        const transition = {
+          id: generateId(),
+          type,
+          name: getTransitionName(type),
+          duration,
+          fromClipId,
+          toClipId,
+          alignment: 'center' as const,
+        };
+
+        state.transitions.push(transition);
+        console.log(`Added ${transition.name} transition (${duration}s)`);
+      });
+    },
+
+    removeTransition: (transitionId: string) => {
+      set((state) => {
+        state.transitions = state.transitions.filter((t) => t.id !== transitionId);
+      });
+    },
+
+    updateTransition: (transitionId: string, updates: any) => {
+      set((state) => {
+        const transition = state.transitions.find((t) => t.id === transitionId);
+        if (transition) {
+          Object.assign(transition, updates);
+        }
+      });
+    },
+
+    getTransitions: () => {
+      return get().transitions;
+    },
   }))
 );
+
+/**
+ * Get transition name from type
+ */
+function getTransitionName(type: string): string {
+  const names: Record<string, string> = {
+    cross_dissolve: 'Cross Dissolve',
+    dip_to_black: 'Dip to Black',
+    dip_to_white: 'Dip to White',
+    fade: 'Fade',
+    wipe_left: 'Wipe Left',
+    wipe_right: 'Wipe Right',
+    wipe_up: 'Wipe Up',
+    wipe_down: 'Wipe Down',
+    push_left: 'Push Left',
+    push_right: 'Push Right',
+    zoom_in: 'Zoom In',
+    zoom_out: 'Zoom Out',
+  };
+  return names[type] || 'Transition';
+}
 
 /**
  * Selectors for common timeline queries

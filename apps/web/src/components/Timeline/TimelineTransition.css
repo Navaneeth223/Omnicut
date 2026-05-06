@@ -1,0 +1,63 @@
+/**
+ * Timeline Transition Styles
+ */
+
+.timeline-transition {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 40px;
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.8), rgba(168, 85, 247, 0.8));
+  border: 2px solid rgba(139, 92, 246, 1);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  z-index: 10;
+  overflow: hidden;
+}
+
+.timeline-transition:hover {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 1), rgba(168, 85, 247, 1));
+  transform: translateY(-50%) scale(1.05);
+  box-shadow: 0 4px 12px rgba(139, 92, 246, 0.5);
+}
+
+.timeline-transition__icon {
+  font-size: 1rem;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+.timeline-transition__name {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Transition types */
+.timeline-transition--dissolve {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(96, 165, 250, 0.8));
+  border-color: rgba(59, 130, 246, 1);
+}
+
+.timeline-transition--wipe {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(52, 211, 153, 0.8));
+  border-color: rgba(16, 185, 129, 1);
+}
+
+.timeline-transition--push {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(251, 191, 36, 0.8));
+  border-color: rgba(245, 158, 11, 1);
+}
+
+.timeline-transition--zoom {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.8), rgba(248, 113, 113, 0.8));
+  border-color: rgba(239, 68, 68, 1);
+}
