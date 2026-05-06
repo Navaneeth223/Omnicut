@@ -23,7 +23,7 @@ export function TimelineTrack({ track, zoomLevel }: TimelineTrackProps) {
       }}
     >
       {track.clips.map((clip) => {
-        const mediaItem = mediaItems.find((item) => item.id === clip.mediaId);
+        const mediaItem = mediaItems.find((item) => item.id === clip.mediaItemId);
         
         return (
           <TimelineClip
@@ -32,6 +32,7 @@ export function TimelineTrack({ track, zoomLevel }: TimelineTrackProps) {
             mediaItem={mediaItem}
             zoomLevel={zoomLevel}
             trackType={track.type}
+            trackId={track.id}
           />
         );
       })}

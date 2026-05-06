@@ -3,16 +3,24 @@
  */
 
 import { useEffect, useState } from 'react';
-import { useProjectStore, useTimelineStore, useMediaPoolStore } from '@omnicut/store';
+import { useProjectStore, useTimelineStore, useMediaPoolStore, useHistoryStore } from '@omnicut/store';
 import { VERSION, createDefaultProject, generateId } from '@omnicut/core';
 import { MediaPool } from './components/MediaPool/MediaPool';
 import { Timeline } from './components/Timeline/Timeline';
+import { ExportDialog } from './components/Export/ExportDialog';
+import { SettingsDialog } from './components/Settings/SettingsDialog';
+import { EffectsPanel } from './components/Effects/EffectsPanel';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
+import { useAutoSave } from './hooks/useAutoSave';
 import './styles/App.css';
 
 function App() {
   const [workspace, setWorkspace] = useState<'edit' | 'color' | 'audio' | 'photo'>('edit');
+  const [showExportDialog, setShowExportDialog] = useState(false);
+  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showAutoSaveIndicator, setShowAutoSaveIndicator] = useState(false);
+  const [autoSaveInterval, setAutoSaveInterval] = useState(30000);
 
   // Project state
   const project = useProjectStore((state) => state.project);
@@ -30,9 +38,33 @@ function App() {
   // Media pool state
   const initMediaPool = useMediaPoolStore((state) => state.initMediaPool);
 
+  // History state
+  const undo = useHistoryStore((state) => state.undo);
+  const redo = useHistoryStore((state) => state.redo);
+  const canUndo = useHistoryStore((state) => state.canUndo);
+  const canRedo = useHistoryStore((state) => state.canRedo);
+  const getUndoDescription = useHistoryStore((state) => state.getUndoDescription);
+  const getRedoDescription = useHistoryStore((state) => state.getRedoDescription);
+
   // Initialize hooks
   usePlayback();
-  useKeyboardShortcuts();
+  useKeyboardShortcuts({
+    onExport: () => setShowExportDialog(true),
+  });
+
+  // Auto-save hook
+  const autoSave = useAutoSave({
+    interval: autoSaveInterval,
+    enabled: true,
+    onSave: () => {
+      // Show save indicator briefly
+      setShowAutoSaveIndicator(true);
+      setTimeout(() => setShowAutoSaveIndicator(false), 2000);
+    },
+    onError: (error) => {
+      console.error('Auto-save failed:', error);
+    },
+  });
 
   // Initialize default project on mount
   useEffect(() => {
@@ -94,11 +126,39 @@ function App() {
           </nav>
         </div>
         <div className="menu-bar__right">
+          <button
+            className="icon-button"
+            onClick={undo}
+            disabled={!canUndo()}
+            title={`Undo ${getUndoDescription() || ''} (⌘Z)`}
+          >
+            ↶
+          </button>
+          <button
+            className="icon-button"
+            onClick={redo}
+            disabled={!canRedo()}
+            title={`Redo ${getRedoDescription() || ''} (⌘⇧Z)`}
+          >
+            ↷
+          </button>
+          <button
+            className="button button--primary"
+            onClick={() => setShowExportDialog(true)}
+            disabled={!timeline || timeline.tracks.every((t) => t.clips.length === 0)}
+            title="Export video (Cmd+E)"
+          >
+            Export
+          </button>
           <span className="menu__item">
             {project?.name || 'No Project'}
             {isDirty && ' •'}
           </span>
-          <button className="icon-button" title="Settings">
+          <button
+            className="icon-button"
+            onClick={() => setShowSettingsDialog(true)}
+            title="Settings"
+          >
             ⚙️
           </button>
         </div>
@@ -267,6 +327,14 @@ function App() {
                     />
                     <span>Snapping</span>
                   </label>
+                  <label className="checkbox-label">
+                    <input
+                      type="checkbox"
+                      checked={useTimelineStore.getState().rippleMode}
+                      onChange={() => useTimelineStore.getState().toggleRippleMode()}
+                    />
+                    <span>Ripple</span>
+                  </label>
                 </div>
               </div>
               <Timeline />
@@ -276,21 +344,10 @@ function App() {
           {/* Right Panel - Inspector */}
           <aside className="panel panel--right">
             <div className="panel__header">
-              <h2 className="panel__title">Inspector</h2>
+              <h2 className="panel__title">Effects</h2>
             </div>
-            <div className="panel__content">
-              {useTimelineStore.getState().selectedClips.length > 0 ? (
-                <div>
-                  <h3>Clip Properties</h3>
-                  <p>Selected: {useTimelineStore.getState().selectedClips.length} clip(s)</p>
-                </div>
-              ) : (
-                <div className="empty-state">
-                  <div className="empty-state__icon">🔍</div>
-                  <p className="empty-state__text">No clip selected</p>
-                  <p className="empty-state__hint">Select a clip to view properties</p>
-                </div>
-              )}
+            <div className="panel__content panel__content--no-padding">
+              <EffectsPanel />
             </div>
           </aside>
         </div>
@@ -307,6 +364,23 @@ function App() {
               {timeline.tracks.filter((t) => t.clips.length > 0).length} tracks with clips
             </span>
           )}
+          {autoSave.enabled && (
+            <span className="status-item">
+              {autoSave.isSaving ? (
+                <span className="auto-save-indicator auto-save-indicator--saving">
+                  💾 Saving...
+                </span>
+              ) : showAutoSaveIndicator ? (
+                <span className="auto-save-indicator auto-save-indicator--saved">
+                  ✓ Saved
+                </span>
+              ) : (
+                <span className="auto-save-indicator">
+                  💾 Auto-save: {autoSave.formatTimeSinceLastSave()}
+                </span>
+              )}
+            </span>
+          )}
         </div>
         <div className="status-bar__right">
           <span className="status-item">
@@ -318,6 +392,20 @@ function App() {
           </span>
         </div>
       </footer>
+
+      {/* Export Dialog */}
+      {showExportDialog && <ExportDialog onClose={() => setShowExportDialog(false)} />}
+
+      {/* Settings Dialog */}
+      {showSettingsDialog && (
+        <SettingsDialog
+          onClose={() => setShowSettingsDialog(false)}
+          autoSaveEnabled={autoSave.enabled}
+          autoSaveInterval={autoSaveInterval}
+          onAutoSaveToggle={autoSave.toggle}
+          onAutoSaveIntervalChange={setAutoSaveInterval}
+        />
+      )}
     </div>
   );
 }

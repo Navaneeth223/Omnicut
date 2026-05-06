@@ -146,6 +146,10 @@
   padding: var(--space-3);
 }
 
+.panel__content--no-padding {
+  padding: 0;
+}
+
 /* Center Area */
 .center-area {
   display: flex;
@@ -275,6 +279,11 @@
   background-color: var(--bg-hover);
 }
 
+.icon-button--active {
+  background-color: var(--accent-blue);
+  color: white;
+}
+
 .icon-button--large {
   width: 40px;
   height: 40px;
@@ -329,6 +338,32 @@
 
 .status-item {
   color: var(--text-secondary);
+}
+
+.auto-save-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: var(--font-size-xs);
+}
+
+.auto-save-indicator--saving {
+  color: var(--accent-blue);
+  animation: pulse 1s ease-in-out infinite;
+}
+
+.auto-save-indicator--saved {
+  color: var(--accent-green);
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
 }
 
 /* Responsive */

@@ -1,0 +1,30 @@
+/**
+ * Snap Indicator Styles
+ */
+
+.snap-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--accent-yellow);
+  pointer-events: none;
+  z-index: 50;
+  animation: snapPulse 0.15s ease-out;
+  box-shadow: 0 0 8px var(--accent-yellow);
+}
+
+@keyframes snapPulse {
+  0% {
+    opacity: 0;
+    transform: scaleY(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scaleY(1.1);
+  }
+  100% {
+    opacity: 0.8;
+    transform: scaleY(1);
+  }
+}

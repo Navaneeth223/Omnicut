@@ -119,6 +119,10 @@ export interface Clip {
   mediaStart: number;
   /** Out-point within source media in seconds */
   mediaEnd: number;
+  /** Trim start (for trimming) */
+  trimStart: number;
+  /** Trim end (for trimming) */
+  trimEnd: number;
   /** Playback speed (1.0 = normal, 2.0 = 2x, -1.0 = reverse) */
   speed: number;
   /** Clip-level effects */
@@ -310,6 +314,8 @@ export function createDefaultClip(
     duration,
     mediaStart: 0,
     mediaEnd: duration,
+    trimStart: 0,
+    trimEnd: duration,
     speed: 1,
     effects: [],
     keyframes: [],

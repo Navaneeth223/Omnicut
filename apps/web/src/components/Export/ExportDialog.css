@@ -1,0 +1,241 @@
+/**
+ * Export Dialog Styles
+ */
+
+.export-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.export-dialog {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  width: 90%;
+  max-width: 700px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease-out;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.export-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-normal);
+}
+
+.export-dialog__header h2 {
+  margin: 0;
+  font-size: var(--font-size-xl);
+}
+
+.close-button {
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  transition: background-color var(--transition-fast);
+}
+
+.close-button:hover {
+  background-color: var(--bg-hover);
+}
+
+.export-dialog__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-4);
+}
+
+.export-section {
+  margin-bottom: var(--space-4);
+}
+
+.export-section h3 {
+  margin: 0 0 var(--space-2) 0;
+  font-size: var(--font-size-md);
+  color: var(--text-secondary);
+}
+
+.preset-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.preset-button {
+  padding: var(--space-2) var(--space-3);
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+  transition: all var(--transition-fast);
+  font-size: var(--font-size-sm);
+}
+
+.preset-button:hover {
+  background: var(--bg-hover);
+  transform: translateY(-1px);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+}
+
+.form-row label {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.form-row input,
+.form-row select {
+  padding: var(--space-2);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-normal);
+  border-radius: 4px;
+  color: var(--text-primary);
+  font-size: var(--font-size-sm);
+}
+
+.form-row input:focus,
+.form-row select:focus {
+  outline: none;
+  border-color: var(--accent-blue);
+}
+
+.form-row input:disabled,
+.form-row select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.export-info {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  padding: var(--space-3);
+  margin-top: var(--space-3);
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  padding: var(--space-1) 0;
+  font-size: var(--font-size-sm);
+}
+
+.info-item span:first-child {
+  color: var(--text-secondary);
+}
+
+.info-item span:last-child {
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.export-progress {
+  margin-top: var(--space-4);
+}
+
+.progress-bar {
+  height: 8px;
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: var(--space-2);
+}
+
+.progress-fill {
+  height: 100%;
+  background: var(--accent-blue);
+  transition: width 0.3s ease-out;
+}
+
+.progress-text {
+  text-align: center;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.export-error {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  background: rgba(255, 59, 48, 0.1);
+  border: 1px solid var(--accent-red);
+  border-radius: 4px;
+  color: var(--accent-red);
+  font-size: var(--font-size-sm);
+}
+
+.export-dialog__footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border-top: 1px solid var(--border-normal);
+}
+
+.button {
+  padding: var(--space-2) var(--space-4);
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+  cursor: pointer;
+}
+
+.button:hover:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background-color: var(--accent-blue);
+  color: white;
+}
+
+.button--primary:hover:not(:disabled) {
+  background-color: var(--accent-blue-hover);
+}

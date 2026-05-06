@@ -19,6 +19,12 @@ export function Timeline() {
   const scrollPosition = useTimelineStore((state) => state.scrollPosition);
   const seek = useTimelineStore((state) => state.seek);
   const scroll = useTimelineStore((state) => state.scroll);
+  const toggleTrackMute = useTimelineStore((state) => state.toggleTrackMute);
+  const toggleTrackLock = useTimelineStore((state) => state.toggleTrackLock);
+  const toggleTrackSolo = useTimelineStore((state) => state.toggleTrackSolo);
+  const toggleTrackVisibility = useTimelineStore((state) => state.toggleTrackVisibility);
+  const rippleMode = useTimelineStore((state) => state.rippleMode);
+  const toggleRippleMode = useTimelineStore((state) => state.toggleRippleMode);
   
   const frameRate = useProjectStore((state) => state.project?.settings.frameRate ?? 30);
 
@@ -82,18 +88,25 @@ export function Timeline() {
               <div className="timeline-track-header__name">{track.name}</div>
               <div className="timeline-track-header__controls">
                 <button
-                  className="icon-button"
+                  className={`icon-button ${track.muted ? 'icon-button--active' : ''}`}
+                  onClick={() => toggleTrackMute(track.id)}
                   title={track.muted ? 'Unmute' : 'Mute'}
-                  style={{ opacity: track.muted ? 0.5 : 1 }}
                 >
-                  {track.type === 'audio' ? '🔇' : '👁️'}
+                  {track.type === 'audio' ? (track.muted ? '🔇' : '🔊') : (track.visible ? '👁️' : '👁️‍🗨️')}
                 </button>
                 <button
-                  className="icon-button"
-                  title={track.locked ? 'Unlock' : 'Lock'}
-                  style={{ opacity: track.locked ? 0.5 : 1 }}
+                  className={`icon-button ${track.solo ? 'icon-button--active' : ''}`}
+                  onClick={() => toggleTrackSolo(track.id)}
+                  title={track.solo ? 'Unsolo' : 'Solo'}
                 >
-                  🔒
+                  S
+                </button>
+                <button
+                  className={`icon-button ${track.locked ? 'icon-button--active' : ''}`}
+                  onClick={() => toggleTrackLock(track.id)}
+                  title={track.locked ? 'Unlock' : 'Lock'}
+                >
+                  {track.locked ? '🔒' : '🔓'}
                 </button>
               </div>
             </div>

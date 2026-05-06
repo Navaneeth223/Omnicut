@@ -1,0 +1,236 @@
+/**
+ * Effects Panel Styles
+ */
+
+.effects-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background: var(--bg-secondary);
+  overflow: hidden;
+}
+
+.effects-panel__header {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.effects-panel__title {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+/* Search */
+.effects-panel__search {
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: border-color 0.2s;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.search-input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* Categories */
+.effects-panel__categories {
+  display: flex;
+  gap: 0.5rem;
+  padding: 1rem;
+  border-bottom: 1px solid var(--border-color);
+  overflow-x: auto;
+}
+
+.category-button {
+  padding: 0.375rem 0.75rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.category-button:hover {
+  background: var(--bg-hover);
+  border-color: var(--primary);
+}
+
+.category-button--active {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+/* Effects Browser */
+.effects-panel__browser {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.effects-panel__section-title {
+  margin: 0 0 1rem 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.effects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 0.75rem;
+}
+
+.effect-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 1rem 0.5rem;
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.effect-card:hover:not(:disabled) {
+  background: var(--bg-hover);
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.effect-card:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.effect-card__icon {
+  font-size: 2rem;
+}
+
+.effect-card__name {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Applied Effects */
+.effects-panel__applied {
+  flex: 1;
+  padding: 1rem;
+  overflow-y: auto;
+}
+
+.effects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.effect-item {
+  background: var(--bg-primary);
+  border: 1px solid var(--border-color);
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.effect-item__header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+}
+
+.effect-item__name {
+  flex: 1;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+/* No Selection State */
+.effects-panel__no-selection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  text-align: center;
+}
+
+.empty-state__icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.empty-state__text {
+  margin: 0 0 0.5rem 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.empty-state__hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-tertiary);
+}
+
+/* Scrollbar */
+.effects-panel__browser::-webkit-scrollbar,
+.effects-panel__applied::-webkit-scrollbar {
+  width: 8px;
+}
+
+.effects-panel__browser::-webkit-scrollbar-track,
+.effects-panel__applied::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+.effects-panel__browser::-webkit-scrollbar-thumb,
+.effects-panel__applied::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 4px;
+}
+
+.effects-panel__browser::-webkit-scrollbar-thumb:hover,
+.effects-panel__applied::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}

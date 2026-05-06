@@ -1,325 +1,338 @@
 # 🚀 OmniCut - Next Steps
 
-**Current Status:** Foundation Complete (35%)  
-**Next Phase:** Media Import & Timeline (Week 3-6)  
-**Goal:** Working video editor with import, edit, and export
+**Current Status:** Effect System (82%)  
+**Next Phase:** Transitions & Polish (Week 7-8)  
+**Goal:** Complete transitions and effect parameters UI
 
 ---
 
-## ✅ What's Done
+## ✅ What's Done (Updated May 6, 2026)
 
+### Foundation (100%)
 - [x] Complete type system (2,500 lines)
 - [x] State management (Zustand stores)
 - [x] Media engine (FFmpeg.wasm)
+- [x] Professional UI layout
+- [x] Design system
+- [x] Documentation (5,000+ lines)
+
+### Media Import (100%)
 - [x] Media pool UI (grid & list views)
 - [x] Import dialog with drag-and-drop
 - [x] Thumbnail & waveform generation
 - [x] Search, filter, and sort
-- [x] Professional UI layout
-- [x] Design system
-- [x] Documentation (4,500 lines)
+- [x] Multi-selection (Cmd+Click, Shift+Click)
+- [x] Context menus
+- [x] Delete with keyboard
+
+### Timeline Editing (100%)
+- [x] Multi-track timeline
+- [x] Timeline ruler with markers
+- [x] Draggable clips
+- [x] Clip trimming with resize handles
+- [x] Double-click to add to timeline
+- [x] Context menus for clips
+- [x] Delete key support
+- [x] Multi-selection
+- [x] Real-time playback (60fps)
+- [x] Keyboard shortcuts (31+)
+- [x] Zoom and scroll
+- [x] Click to seek
+- [x] **Razor tool (split clips)** ✨ NEW
+
+### Advanced Features (100%)
+- [x] Magnetic snapping system
+- [x] Copy/cut/paste clips
+- [x] Duplicate clips
+- [x] Track controls (mute/solo/lock)
+- [x] Select all clips
+- [x] Collision detection
+- [x] Ripple edit mode
+- [x] Ripple delete
+- [x] Find available space
+
+### Professional Tools (100%)
+- [x] Undo/Redo system (200 commands)
+- [x] Auto-save with configurable interval
+- [x] Settings dialog
+- [x] Export system with presets
+- [x] **Effect system (10 basic effects)** ✨ NEW
 
 ---
 
 ## 🎯 Immediate Next Steps (This Week)
 
-### 1. **Test the Media Import** (30 minutes)
+### 1. **Effect Parameters UI** (3 hours)
 
-```bash
-# Start the app
-cd apps/web
-pnpm dev
+**Goal:** Interactive controls for effect parameters
 
-# Open http://localhost:5173
-# Click "Import Media"
-# Select video/audio/image files
-# Verify thumbnails generate
-# Test grid and list views
-# Test search and filter
-```
-
-**Expected Issues:**
-- FFmpeg.wasm might take time to load first time
-- Large files might be slow
-- Some codecs might not work
-
-**How to Fix:**
-- Add loading indicator for FFmpeg
-- Implement proxy generation
-- Add codec detection and warnings
-
-### 2. **Connect Media Pool to Timeline** (2 hours)
-
-**File:** `apps/web/src/components/MediaPool/MediaGrid.tsx`
-
+**Implementation:**
 ```typescript
-// In handleDoubleClick function:
-const handleDoubleClick = (item: MediaItem) => {
-  // Get timeline store
-  const { addClip, timeline } = useTimelineStore.getState();
-  
-  // Find first video track
-  const videoTrack = timeline?.tracks.find(t => t.type === 'video');
-  
-  if (videoTrack && item.duration) {
-    // Create clip
-    const clip = createDefaultClip(
-      videoTrack.id,
-      item.id,
-      timeline.playhead, // Start at playhead
-      item.duration
-    );
-    
-    // Add to timeline
-    addClip(videoTrack.id, clip);
-    
-    // Increment usage count
-    incrementUsageCount(item.id);
-  }
-};
-```
-
-### 3. **Build Timeline Component** (4 hours)
-
-**Create:** `apps/web/src/components/Timeline/Timeline.tsx`
-
-```typescript
-export function Timeline() {
-  const timeline = useTimelineStore((state) => state.timeline);
-  const zoomLevel = useTimelineStore((state) => state.zoomLevel);
-  
-  if (!timeline) return <EmptyTimeline />;
-  
-  return (
-    <div className="timeline">
-      <TimelineRuler duration={timeline.duration} zoom={zoomLevel} />
-      <TimelineTracks tracks={timeline.tracks} />
-      <TimelinePlayhead position={timeline.playhead} />
+// In EffectsPanel.tsx - expand effect items
+<div className="effect-parameters">
+  {effect.parameters.map(param => (
+    <div key={param.id} className="parameter">
+      <label>{param.name}</label>
+      {param.type === 'slider' && (
+        <input
+          type="range"
+          min={param.min}
+          max={param.max}
+          step={param.step}
+          value={param.value}
+          onChange={(e) => updateParameter(effect.id, param.id, e.target.value)}
+        />
+      )}
+      {param.type === 'color' && (
+        <input
+          type="color"
+          value={param.value}
+          onChange={(e) => updateParameter(effect.id, param.id, e.target.value)}
+        />
+      )}
     </div>
-  );
-}
+  ))}
+</div>
 ```
 
-**Components Needed:**
-- `TimelineRuler` - Time ruler with markers
-- `TimelineTracks` - Track list with clips
-- `TimelineClip` - Individual clip component
-- `TimelinePlayhead` - Playhead indicator
-
-### 4. **Implement Basic Playback** (3 hours)
-
-**Create:** `apps/web/src/hooks/usePlayback.ts`
-
-```typescript
-export function usePlayback() {
-  const playing = useTimelineStore((state) => state.playing);
-  const playhead = useTimelineStore((state) => state.timeline?.playhead ?? 0);
-  const seek = useTimelineStore((state) => state.seek);
-  const frameRate = useProjectStore((state) => state.project?.settings.frameRate ?? 30);
-  
-  useEffect(() => {
-    if (!playing) return;
-    
-    const interval = setInterval(() => {
-      const newTime = playhead + (1 / frameRate);
-      seek(newTime);
-    }, 1000 / frameRate);
-    
-    return () => clearInterval(interval);
-  }, [playing, playhead, frameRate, seek]);
-}
-```
+**Files to modify:**
+- `apps/web/src/components/Effects/EffectsPanel.tsx`
+- `apps/web/src/components/Effects/EffectsPanel.css`
+- `packages/store/src/timeline-store.ts` (add updateEffectParameter)
 
 ---
 
-## 📅 Week-by-Week Plan
+### 2. **Transitions System** (4 hours)
 
-### **Week 3-4: Media Import & Organization** ✅ (Current)
-- [x] Media import with FFmpeg
-- [x] Thumbnail generation
-- [x] Waveform generation
-- [x] Grid and list views
-- [x] Search and filter
-- [ ] Bin management UI
-- [ ] Context menus
-- [ ] Keyboard shortcuts
+**Goal:** Add transitions between clips
 
-### **Week 5-6: Timeline Basics**
-- [ ] Timeline UI component
-- [ ] Track rendering
-- [ ] Clip rendering
-- [ ] Drag clips from media pool
-- [ ] Drag clips on timeline
-- [ ] Resize clips
-- [ ] Delete clips
-- [ ] Basic playback
-- [ ] Scrubbing
-- [ ] Zoom and scroll
+**Implementation:**
+```typescript
+// In timeline-store.ts
+interface Transition {
+  id: string;
+  type: 'crossfade' | 'dissolve' | 'wipe';
+  duration: number;
+  fromClipId: string;
+  toClipId: string;
+}
 
-### **Week 7-8: Export**
-- [ ] Export dialog
-- [ ] Codec selection
-- [ ] Resolution options
-- [ ] Frame rate options
-- [ ] Bitrate settings
-- [ ] Progress tracking
-- [ ] Background rendering
-- [ ] Export presets
+addTransition: (fromClipId: string, toClipId: string, type: TransitionType) => {
+  // Create transition between clips
+}
+```
 
-### **Week 9-10: Effects**
-- [ ] Effect panel
-- [ ] Effect browser
-- [ ] Apply effects to clips
-- [ ] Effect parameters
+**Transitions to implement:**
+1. Crossfade (audio/video)
+2. Dissolve
+3. Wipe (left, right, up, down)
+4. Dip to black
+
+**Files to create:**
+- `apps/web/src/components/Timeline/TimelineTransition.tsx`
+- `apps/web/src/components/Timeline/TimelineTransition.css`
+
+**Files to modify:**
+- `packages/store/src/timeline-store.ts`
+- `apps/web/src/components/Timeline/Timeline.tsx`
+
+---
+
+### 3. **Effect Preview** (2 hours)
+
+**Goal:** Real-time effect preview in viewer
+
+**Implementation:**
+```typescript
+// In viewer component
+const applyEffects = (frame: ImageData, effects: Effect[]) => {
+  let result = frame;
+  for (const effect of effects.filter(e => e.enabled)) {
+    result = applyEffect(result, effect);
+  }
+  return result;
+};
+```
+
+**Files to create:**
+- `apps/web/src/utils/effectRenderer.ts`
+
+**Files to modify:**
+- `apps/web/src/App.tsx` (viewer section)
+
+---
+
+## 📅 Week-by-Week Plan (Updated)
+
+### **Week 7: Transitions & Effect UI** (Current)
+- [x] Razor tool ✨
+- [x] Effect system (10 effects) ✨
+- [ ] Effect parameters UI
+- [ ] Transitions (4 types)
 - [ ] Effect preview
-- [ ] Keyframe animation
-- [ ] 10 basic effects
+- [ ] Transition preview
 
-### **Week 11-12: Polish & MVP**
-- [ ] Keyboard shortcuts
-- [ ] Undo/redo
-- [ ] Auto-save
-- [ ] Project templates
-- [ ] Tutorial
+### **Week 8: FFmpeg Integration**
+- [ ] FFmpeg.wasm setup
+- [ ] Video rendering pipeline
+- [ ] Apply effects during export
+- [ ] Apply transitions during export
+- [ ] Progress tracking
+- [ ] Error handling
+- [ ] Export optimization
+
+### **Week 9: Audio & Color**
+- [ ] Audio mixer
+- [ ] Volume keyframes
+- [ ] Fade in/out
+- [ ] Color grading panel
+- [ ] Basic color correction
+- [ ] LUTs support
+
+### **Week 10-11: Polish & Testing**
 - [ ] Bug fixes
 - [ ] Performance optimization
-- [ ] **MVP Release** 🎉
+- [ ] UI polish
+- [ ] Keyboard shortcut customization
+- [ ] Project templates
+- [ ] Tutorial/onboarding
+
+### **Week 12: MVP Release**
+- [ ] Final testing
+- [ ] Documentation
+- [ ] Release notes
+- [ ] **1.0 Release** 🎉
 
 ---
 
 ## 🔧 Technical Tasks
 
 ### **High Priority**
-1. **Fix FFmpeg Loading**
-   - Add loading indicator
-   - Cache FFmpeg in IndexedDB
-   - Lazy load only when needed
+1. **Effect Parameters UI**
+   - Slider controls
+   - Color pickers
+   - Angle controls
+   - Number inputs
+   - Real-time updates
 
-2. **Optimize Thumbnail Generation**
-   - Use Web Workers
-   - Generate in background
-   - Cache thumbnails
+2. **Transitions**
+   - Crossfade
+   - Dissolve
+   - Wipe (4 directions)
+   - Dip to black/white
+   - Custom duration
+   - Easing functions
 
-3. **Add Error Handling**
-   - Toast notifications
-   - Error boundaries
-   - Retry logic
-
-4. **Implement Undo/Redo**
-   - Command pattern
-   - History stack (200 steps)
-   - Keyboard shortcuts (Cmd+Z, Cmd+Shift+Z)
+3. **FFmpeg Integration**
+   - Load FFmpeg.wasm
+   - Render video with effects
+   - Render transitions
+   - Progress tracking
+   - Multiple formats
 
 ### **Medium Priority**
-5. **Add Keyboard Shortcuts**
-   - Import (Cmd+I)
-   - Play/Pause (Space)
-   - Delete (Delete)
-   - Select All (Cmd+A)
-   - Undo/Redo (Cmd+Z, Cmd+Shift+Z)
+4. **Effect Preview**
+   - Canvas-based rendering
+   - Apply effects in real-time
+   - Performance optimization
+   - WebGL acceleration
 
-6. **Implement Context Menus**
-   - Right-click on media items
-   - Right-click on clips
-   - Common actions
+5. **Audio Features**
+   - Volume keyframes
+   - Fade in/out
+   - Audio effects
+   - Waveform visualization
 
-7. **Add Settings Panel**
-   - Import preferences
-   - Proxy settings
-   - Auto-save interval
-   - Keyboard shortcuts
+6. **Color Grading**
+   - Color wheels
+   - Curves
+   - LUTs
+   - Scopes
 
 ### **Low Priority**
-8. **Add Bins**
-   - Create/delete bins
-   - Drag items to bins
-   - Nested bins
-   - Bin navigation
+7. **Advanced Effects**
+   - Keyframe animation
+   - Effect presets
+   - Custom effects
+   - Effect stacking
 
-9. **Add Smart Bins**
-   - Auto-filter by type
-   - Auto-filter by resolution
-   - Auto-filter by date
-
-10. **Add Metadata Editor**
-    - Edit name
-    - Edit tags
-    - Edit rating
-    - Edit description
+8. **Project Features**
+   - Project templates
+   - Bins & organization
+   - Nested sequences
+   - Multi-camera editing
 
 ---
 
 ## 🧪 Testing Plan
 
 ### **Manual Testing** (This Week)
-1. Import 10 different file types
-2. Test grid and list views
-3. Test search with various queries
-4. Test filter by type
-5. Test selection (single, multi, range)
-6. Test drag and drop
-7. Test on different browsers
-8. Test on different screen sizes
+1. [x] Test razor tool on various clips
+2. [x] Test split at playhead
+3. [x] Test effect application
+4. [x] Test effect enable/disable
+5. [x] Test effect removal
+6. [ ] Test effect parameters
+7. [ ] Test transitions
+8. [ ] Test effect preview
 
-### **Automated Testing** (Week 5-6)
-1. Write unit tests for stores
-2. Write unit tests for utilities
-3. Write integration tests for import
-4. Write E2E tests for workflows
-5. Set up CI to run tests
-6. Aim for 80%+ coverage
+### **Automated Testing** (Week 10)
+1. Write unit tests for effects
+2. Write unit tests for transitions
+3. Write integration tests
+4. Set up CI pipeline
+5. Aim for 80%+ coverage
 
 ---
 
 ## 📊 Success Metrics
 
-### **Week 3-4 Goals**
-- [ ] Can import 10 files in < 30 seconds
-- [ ] Thumbnails generate in < 2 seconds each
-- [ ] Search returns results in < 100ms
-- [ ] UI is responsive (60fps)
-- [ ] No memory leaks
-- [ ] Works in Chrome, Firefox, Safari
+### **Week 7 Goals**
+- [x] Can split clips with razor tool
+- [x] Can apply 10 different effects
+- [ ] Can adjust effect parameters
+- [ ] Can add transitions between clips
+- [ ] Effects preview in real-time
 
-### **Week 5-6 Goals**
-- [ ] Can add clips to timeline
-- [ ] Can play timeline at 30fps
-- [ ] Can scrub smoothly
-- [ ] Can zoom timeline
-- [ ] Can delete clips
-- [ ] Undo/redo works
-
-### **Week 7-8 Goals**
-- [ ] Can export 1080p video
-- [ ] Export completes in reasonable time
+### **Week 8 Goals**
+- [ ] Can export video with effects
+- [ ] Can export video with transitions
+- [ ] Export completes successfully
 - [ ] Output file plays correctly
-- [ ] Multiple export formats work
+
+### **Week 9 Goals**
+- [ ] Can adjust audio levels
+- [ ] Can apply color grading
+- [ ] Can use LUTs
+- [ ] Real-time preview works
 
 ---
 
 ## 🐛 Known Issues
 
 ### **Current**
-1. FFmpeg.wasm takes ~3s to load first time
-2. Large files (>1GB) might crash browser
-3. Some video codecs not supported
-4. Waveform generation is slow for long audio
+1. Effect parameters not editable yet
+2. No transitions yet
+3. No effect preview in viewer
+4. FFmpeg not integrated (export simulated)
+5. No audio mixing yet
 
 ### **To Fix**
-1. Add FFmpeg loading indicator
-2. Implement file size limits and warnings
-3. Add codec detection and fallback
-4. Optimize waveform algorithm
+1. Add effect parameter controls
+2. Implement transitions
+3. Add effect preview
+4. Integrate FFmpeg.wasm
+5. Add audio features
 
 ---
 
 ## 💡 Ideas for Later
 
 ### **Features**
-- Multi-camera editing
-- Color grading suite
-- Audio mixer
-- Motion graphics
+- Effect presets
+- Custom effects (plugins)
+- Motion tracking
+- Stabilization
 - AI features (auto-edit, transcription)
 - Collaboration (real-time editing)
 - Cloud sync
@@ -340,30 +353,33 @@ export function usePlayback() {
 - **Documentation:** [docs/](./docs/)
 - **Architecture:** [docs/architecture.md](./docs/architecture.md)
 - **Roadmap:** [docs/roadmap.md](./docs/roadmap.md)
-- **Discord:** [discord.gg/omnicut](https://discord.gg/omnicut)
-- **GitHub Issues:** [github.com/omnicut/omnicut/issues](https://github.com/omnicut/omnicut/issues)
+- **Session 7 Report:** [FEATURES_ADDED_SESSION7.md](./FEATURES_ADDED_SESSION7.md)
 
 ### **Common Questions**
 
-**Q: How do I add a new feature?**
-A: 1) Add types to `@omnicut/core`, 2) Add state to `@omnicut/store`, 3) Add UI to `@omnicut/web`
+**Q: How do I add a new effect?**
+A: Add to BASIC_EFFECTS array in EffectsPanel.tsx with parameters
 
-**Q: How do I test locally?**
-A: Run `pnpm dev` in `apps/web` and open http://localhost:5173
+**Q: How do I test effects?**
+A: Select a clip, click an effect in the Effects panel
 
-**Q: How do I build for production?**
-A: Run `pnpm build` in root directory
+**Q: How do I split a clip?**
+A: Position playhead over clip, press C key
 
-**Q: How do I contribute?**
-A: See [CONTRIBUTING.md](./CONTRIBUTING.md)
+**Q: How do I adjust effect parameters?**
+A: Coming soon! Will be in the applied effects section
 
 ---
 
 ## 🎉 You're Ready!
 
-Everything is set up and ready to go. The foundation is solid, the architecture is clean, and the code is production-ready.
+**Recent achievements:**
+- ✅ Razor tool for splitting clips
+- ✅ Complete effect system (10 effects)
+- ✅ Effect browser with search
+- ✅ Apply/remove/toggle effects
 
-**Next action:** Start the app and test media import!
+**Next action:** Implement effect parameters UI!
 
 ```bash
 cd apps/web
@@ -375,3 +391,5 @@ pnpm dev
 ---
 
 *Last Updated: May 6, 2026*
+*Progress: 82% of MVP*
+*Next Milestone: Transitions & Effect Parameters*
