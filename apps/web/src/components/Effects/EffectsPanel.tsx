@@ -7,6 +7,11 @@ import { useState } from 'react';
 import { useTimelineStore } from '@omnicut/store';
 import type { Effect, EffectType, EffectCategory } from '@omnicut/core';
 import { generateId } from '@omnicut/core';
+import {
+  createAddEffectCommand,
+  createRemoveEffectCommand,
+  createUpdateEffectParameterCommand,
+} from '../../utils/commands';
 import './EffectsPanel.css';
 
 interface EffectDefinition {
@@ -455,9 +460,7 @@ export function EffectsPanel() {
     if (!selectedClip) return;
 
     const effect = createEffect(effectDef);
-    const updatedEffects = [...selectedClip.effects, effect];
-
-    updateClip(selectedClip.id, { effects: updatedEffects });
+    createAddEffectCommand(selectedClip.id, effect);
     console.log(`Applied "${effect.name}" to clip "${selectedClip.name}"`);
   };
 
@@ -467,8 +470,7 @@ export function EffectsPanel() {
   const removeEffect = (effectId: string) => {
     if (!selectedClip) return;
 
-    const updatedEffects = selectedClip.effects.filter((e) => e.id !== effectId);
-    updateClip(selectedClip.id, { effects: updatedEffects });
+    createRemoveEffectCommand(selectedClip.id, effectId);
   };
 
   /**
@@ -481,6 +483,185 @@ export function EffectsPanel() {
       e.id === effectId ? { ...e, enabled: !e.enabled } : e
     );
     updateClip(selectedClip.id, { effects: updatedEffects });
+  };
+
+  /**
+   * Update effect parameter
+   */
+  const updateEffectParameter = (effectId: string, parameterId: string, value: any) => {
+    if (!selectedClip) return;
+
+    // Get old value for undo
+    const effect = selectedClip.effects.find((e) => e.id === effectId);
+    if (!effect) return;
+    
+    const param = effect.parameters.find((p) => p.id === parameterId);
+    if (!param) return;
+    
+    const oldValue = param.value;
+
+    // Only create command if value actually changed
+    if (oldValue !== value) {
+      createUpdateEffectParameterCommand(selectedClip.id, effectId, parameterId, value, oldValue);
+    }
+  };
+
+  /**
+   * Reset effect parameter to default
+   */
+  const resetEffectParameter = (effectId: string, parameterId: string) => {
+    if (!selectedClip) return;
+
+    const updatedEffects = selectedClip.effects.map((effect) => {
+      if (effect.id === effectId) {
+        return {
+          ...effect,
+          parameters: effect.parameters.map((param) =>
+            param.id === parameterId ? { ...param, value: param.defaultValue } : param
+          ),
+        };
+      }
+      return effect;
+    });
+
+    updateClip(selectedClip.id, { effects: updatedEffects });
+  };
+
+  /**
+   * Render parameter control based on type
+   */
+  const renderParameterControl = (effect: Effect, param: EffectParameter) => {
+    switch (param.type) {
+      case 'slider':
+      case 'number':
+        return (
+          <div className="parameter-control">
+            <div className="parameter-header">
+              <label className="parameter-label">{param.name}</label>
+              <div className="parameter-value">
+                {typeof param.value === 'number' ? param.value.toFixed(1) : param.value}
+                {param.unit}
+              </div>
+              <button
+                className="parameter-reset"
+                onClick={() => resetEffectParameter(effect.id, param.id)}
+                title="Reset to default"
+              >
+                ↺
+              </button>
+            </div>
+            <input
+              type="range"
+              className="parameter-slider"
+              min={param.min}
+              max={param.max}
+              step={param.step}
+              value={param.value as number}
+              onChange={(e) =>
+                updateEffectParameter(effect.id, param.id, parseFloat(e.target.value))
+              }
+            />
+          </div>
+        );
+
+      case 'angle':
+        return (
+          <div className="parameter-control">
+            <div className="parameter-header">
+              <label className="parameter-label">{param.name}</label>
+              <div className="parameter-value">
+                {typeof param.value === 'number' ? param.value.toFixed(0) : param.value}°
+              </div>
+              <button
+                className="parameter-reset"
+                onClick={() => resetEffectParameter(effect.id, param.id)}
+                title="Reset to default"
+              >
+                ↺
+              </button>
+            </div>
+            <input
+              type="range"
+              className="parameter-slider"
+              min={param.min}
+              max={param.max}
+              step={param.step}
+              value={param.value as number}
+              onChange={(e) =>
+                updateEffectParameter(effect.id, param.id, parseFloat(e.target.value))
+              }
+            />
+          </div>
+        );
+
+      case 'color':
+        return (
+          <div className="parameter-control">
+            <div className="parameter-header">
+              <label className="parameter-label">{param.name}</label>
+              <button
+                className="parameter-reset"
+                onClick={() => resetEffectParameter(effect.id, param.id)}
+                title="Reset to default"
+              >
+                ↺
+              </button>
+            </div>
+            <input
+              type="color"
+              className="parameter-color"
+              value={param.value as string}
+              onChange={(e) => updateEffectParameter(effect.id, param.id, e.target.value)}
+            />
+          </div>
+        );
+
+      case 'boolean':
+        return (
+          <div className="parameter-control">
+            <label className="parameter-checkbox">
+              <input
+                type="checkbox"
+                checked={param.value as boolean}
+                onChange={(e) =>
+                  updateEffectParameter(effect.id, param.id, e.target.checked)
+                }
+              />
+              <span>{param.name}</span>
+            </label>
+          </div>
+        );
+
+      case 'choice':
+        return (
+          <div className="parameter-control">
+            <div className="parameter-header">
+              <label className="parameter-label">{param.name}</label>
+              <button
+                className="parameter-reset"
+                onClick={() => resetEffectParameter(effect.id, param.id)}
+                title="Reset to default"
+              >
+                ↺
+              </button>
+            </div>
+            <select
+              className="parameter-select"
+              value={param.value as string | number}
+              onChange={(e) => updateEffectParameter(effect.id, param.id, e.target.value)}
+            >
+              {param.options?.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </div>
+        );
+
+      default:
+        return null;
+    }
   };
 
   return (
@@ -568,7 +749,14 @@ export function EffectsPanel() {
                       ✕
                     </button>
                   </div>
-                  {/* Effect parameters would go here */}
+                  {/* Effect Parameters */}
+                  {effect.enabled && effect.parameters.length > 0 && (
+                    <div className="effect-parameters">
+                      {effect.parameters.map((param) => (
+                        <div key={param.id}>{renderParameterControl(effect, param)}</div>
+                      ))}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

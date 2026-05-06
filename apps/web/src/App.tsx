@@ -10,6 +10,7 @@ import { Timeline } from './components/Timeline/Timeline';
 import { ExportDialog } from './components/Export/ExportDialog';
 import { SettingsDialog } from './components/Settings/SettingsDialog';
 import { EffectsPanel } from './components/Effects/EffectsPanel';
+import { TransitionsPanel } from './components/Transitions/TransitionsPanel';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -21,6 +22,7 @@ function App() {
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showAutoSaveIndicator, setShowAutoSaveIndicator] = useState(false);
   const [autoSaveInterval, setAutoSaveInterval] = useState(30000);
+  const [rightPanelTab, setRightPanelTab] = useState<'effects' | 'transitions'>('effects');
 
   // Project state
   const project = useProjectStore((state) => state.project);
@@ -341,13 +343,26 @@ function App() {
             </div>
           </div>
 
-          {/* Right Panel - Inspector */}
+          {/* Right Panel - Effects & Transitions */}
           <aside className="panel panel--right">
             <div className="panel__header">
-              <h2 className="panel__title">Effects</h2>
+              <div className="panel__tabs">
+                <button
+                  className={`panel__tab ${rightPanelTab === 'effects' ? 'panel__tab--active' : ''}`}
+                  onClick={() => setRightPanelTab('effects')}
+                >
+                  Effects
+                </button>
+                <button
+                  className={`panel__tab ${rightPanelTab === 'transitions' ? 'panel__tab--active' : ''}`}
+                  onClick={() => setRightPanelTab('transitions')}
+                >
+                  Transitions
+                </button>
+              </div>
             </div>
             <div className="panel__content panel__content--no-padding">
-              <EffectsPanel />
+              {rightPanelTab === 'effects' ? <EffectsPanel /> : <TransitionsPanel />}
             </div>
           </aside>
         </div>

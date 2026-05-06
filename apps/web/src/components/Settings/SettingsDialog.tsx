@@ -130,23 +130,49 @@ export function SettingsDialog({
           {activeTab === 'shortcuts' && (
             <div className="settings-panel">
               <div className="settings-section">
-                <h3>Keyboard Shortcuts</h3>
+                <h3>Playback</h3>
                 <div className="shortcuts-list">
                   <div className="shortcut-item">
                     <span>Play/Pause</span>
                     <kbd>Space</kbd>
                   </div>
                   <div className="shortcut-item">
-                    <span>Undo</span>
-                    <kbd>⌘Z</kbd>
+                    <span>Go to Start</span>
+                    <kbd>Home</kbd>
                   </div>
                   <div className="shortcut-item">
-                    <span>Redo</span>
-                    <kbd>⌘⇧Z</kbd>
+                    <span>Go to End</span>
+                    <kbd>End</kbd>
                   </div>
+                  <div className="shortcut-item">
+                    <span>Step Forward 1 Frame</span>
+                    <kbd>→</kbd>
+                  </div>
+                  <div className="shortcut-item">
+                    <span>Step Backward 1 Frame</span>
+                    <kbd>←</kbd>
+                  </div>
+                  <div className="shortcut-item">
+                    <span>Step Forward 10 Frames</span>
+                    <kbd>Shift + →</kbd>
+                  </div>
+                  <div className="shortcut-item">
+                    <span>Step Backward 10 Frames</span>
+                    <kbd>Shift + ←</kbd>
+                  </div>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>Editing</h3>
+                <div className="shortcuts-list">
                   <div className="shortcut-item">
                     <span>Copy</span>
                     <kbd>⌘C</kbd>
+                  </div>
+                  <div className="shortcut-item">
+                    <span>Cut</span>
+                    <kbd>⌘X</kbd>
                   </div>
                   <div className="shortcut-item">
                     <span>Paste</span>
@@ -161,13 +187,15 @@ export function SettingsDialog({
                     <kbd>Delete</kbd>
                   </div>
                   <div className="shortcut-item">
-                    <span>Export</span>
-                    <kbd>⌘E</kbd>
+                    <span>Split Clips at Playhead</span>
+                    <kbd>C</kbd>
                   </div>
-                  <div className="shortcut-item">
-                    <span>Save</span>
-                    <kbd>⌘S</kbd>
-                  </div>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>Timeline</h3>
+                <div className="shortcuts-list">
                   <div className="shortcut-item">
                     <span>Zoom In</span>
                     <kbd>+</kbd>
@@ -177,6 +205,34 @@ export function SettingsDialog({
                     <kbd>-</kbd>
                   </div>
                 </div>
+              </div>
+
+              <div className="settings-section">
+                <h3>Project</h3>
+                <div className="shortcuts-list">
+                  <div className="shortcut-item">
+                    <span>Undo</span>
+                    <kbd>⌘Z</kbd>
+                  </div>
+                  <div className="shortcut-item">
+                    <span>Redo</span>
+                    <kbd>⌘⇧Z</kbd>
+                  </div>
+                  <div className="shortcut-item">
+                    <span>Save</span>
+                    <kbd>⌘S</kbd>
+                  </div>
+                  <div className="shortcut-item">
+                    <span>Export</span>
+                    <kbd>⌘E</kbd>
+                  </div>
+                </div>
+              </div>
+
+              <div className="settings-section">
+                <p className="settings-description">
+                  💡 Tip: On Windows, use Ctrl instead of ⌘ (Command)
+                </p>
               </div>
             </div>
           )}

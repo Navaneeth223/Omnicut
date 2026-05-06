@@ -140,6 +140,34 @@
   font-weight: 600;
 }
 
+.panel__tabs {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.panel__tab {
+  flex: 1;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.panel__tab:hover {
+  color: var(--text-primary);
+  background: var(--bg-hover);
+}
+
+.panel__tab--active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+}
+
 .panel__content {
   flex: 1;
   overflow-y: auto;

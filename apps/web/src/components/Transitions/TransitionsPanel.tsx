@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useTimelineStore } from '@omnicut/store';
+import { createAddTransitionCommand, createRemoveTransitionCommand } from '../../utils/commands';
 import './TransitionsPanel.css';
 
 interface TransitionDefinition {
@@ -164,7 +165,7 @@ export function TransitionsPanel() {
       return;
     }
 
-    addTransition(clip1.id, clip2.id, transitionDef.type, duration);
+    createAddTransitionCommand(clip1.id, clip2.id, transitionDef.type, duration);
     console.log(`Applied "${transitionDef.name}" transition (${duration}s)`);
   };
 
@@ -255,7 +256,7 @@ export function TransitionsPanel() {
                   <span className="transition-item__duration">{transition.duration}s</span>
                   <button
                     className="icon-button"
-                    onClick={() => removeTransition(transition.id)}
+                    onClick={() => createRemoveTransitionCommand(transition.id)}
                     title="Remove transition"
                   >
                     ✕
