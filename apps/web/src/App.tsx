@@ -1,13 +1,77 @@
 /**
- * Main Application Component
+ * Main Application Component - Complete Integration
  */
 
-import { useState } from 'react';
-import { VERSION } from '@omnicut/core';
+import { useEffect, useState } from 'react';
+import { useProjectStore, useTimelineStore, useMediaPoolStore } from '@omnicut/store';
+import { VERSION, createDefaultProject, generateId } from '@omnicut/core';
+import { MediaPool } from './components/MediaPool/MediaPool';
+import { Timeline } from './components/Timeline/Timeline';
+import { usePlayback } from './hooks/usePlayback';
+import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import './styles/App.css';
 
 function App() {
   const [workspace, setWorkspace] = useState<'edit' | 'color' | 'audio' | 'photo'>('edit');
+
+  // Project state
+  const project = useProjectStore((state) => state.project);
+  const createProject = useProjectStore((state) => state.createProject);
+  const isDirty = useProjectStore((state) => state.isDirty);
+
+  // Timeline state
+  const timeline = useTimelineStore((state) => state.timeline);
+  const playing = useTimelineStore((state) => state.playing);
+  const togglePlay = useTimelineStore((state) => state.togglePlay);
+  const playhead = useTimelineStore((state) => state.timeline?.playhead ?? 0);
+  const initTimeline = useTimelineStore((state) => state.initTimeline);
+  const addTrack = useTimelineStore((state) => state.addTrack);
+
+  // Media pool state
+  const initMediaPool = useMediaPoolStore((state) => state.initMediaPool);
+
+  // Initialize hooks
+  usePlayback();
+  useKeyboardShortcuts();
+
+  // Initialize default project on mount
+  useEffect(() => {
+    if (!project) {
+      const newProject = {
+        ...createDefaultProject('Untitled Project'),
+        id: generateId(),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      };
+      
+      createProject(newProject.name);
+      
+      // Initialize timeline with default tracks
+      const newTimeline = {
+        ...newProject.timeline,
+        id: generateId(),
+      };
+      initTimeline(newTimeline);
+      
+      // Add default tracks
+      addTrack('video');
+      addTrack('video');
+      addTrack('audio');
+      addTrack('audio');
+      
+      // Initialize media pool
+      initMediaPool(newProject.mediaPool);
+    }
+  }, [project, createProject, initTimeline, addTrack, initMediaPool]);
+
+  // Format timecode
+  const formatTimecode = (seconds: number) => {
+    const h = Math.floor(seconds / 3600);
+    const m = Math.floor((seconds % 3600) / 60);
+    const s = Math.floor(seconds % 60);
+    const f = Math.floor((seconds % 1) * (project?.settings.frameRate ?? 30));
+    return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}:${f.toString().padStart(2, '0')}`;
+  };
 
   return (
     <div className="app">
@@ -30,6 +94,10 @@ function App() {
           </nav>
         </div>
         <div className="menu-bar__right">
+          <span className="menu__item">
+            {project?.name || 'No Project'}
+            {isDirty && ' •'}
+          </span>
           <button className="icon-button" title="Settings">
             ⚙️
           </button>
@@ -69,36 +137,70 @@ function App() {
         <div className="layout">
           {/* Left Panel - Media Pool */}
           <aside className="panel panel--left">
-            <div className="panel__header">
-              <h2 className="panel__title">Media Pool</h2>
-            </div>
-            <div className="panel__content">
-              <div className="empty-state">
-                <div className="empty-state__icon">📁</div>
-                <p className="empty-state__text">No media imported</p>
-                <button className="button button--primary">Import Media</button>
-              </div>
-            </div>
+            <MediaPool />
           </aside>
 
-          {/* Center - Viewer */}
+          {/* Center - Viewer & Timeline */}
           <div className="center-area">
+            {/* Viewer */}
             <div className="viewer-container">
               <div className="viewer">
                 <div className="viewer__canvas">
                   <div className="empty-state">
                     <div className="empty-state__icon">🎬</div>
-                    <p className="empty-state__text">No sequence loaded</p>
-                    <button className="button button--primary">New Sequence</button>
+                    <p className="empty-state__text">Preview</p>
+                    <p className="empty-state__hint">
+                      {timeline && timeline.tracks.length > 0
+                        ? 'Press Space to play'
+                        : 'Add clips to timeline to preview'}
+                    </p>
                   </div>
                 </div>
                 <div className="viewer__controls">
-                  <button className="icon-button" title="Go to start">⏮</button>
-                  <button className="icon-button" title="Step back">⏪</button>
-                  <button className="icon-button icon-button--large" title="Play">▶️</button>
-                  <button className="icon-button" title="Step forward">⏩</button>
-                  <button className="icon-button" title="Go to end">⏭</button>
-                  <div className="timecode">00:00:00:00</div>
+                  <button
+                    className="icon-button"
+                    onClick={() => useTimelineStore.getState().goToStart()}
+                    title="Go to start (Home)"
+                  >
+                    ⏮
+                  </button>
+                  <button
+                    className="icon-button"
+                    onClick={() =>
+                      useTimelineStore
+                        .getState()
+                        .stepBackward(project?.settings.frameRate ?? 30)
+                    }
+                    title="Step back (←)"
+                  >
+                    ⏪
+                  </button>
+                  <button
+                    className="icon-button icon-button--large"
+                    onClick={togglePlay}
+                    title={playing ? 'Pause (Space)' : 'Play (Space)'}
+                  >
+                    {playing ? '⏸️' : '▶️'}
+                  </button>
+                  <button
+                    className="icon-button"
+                    onClick={() =>
+                      useTimelineStore
+                        .getState()
+                        .stepForward(project?.settings.frameRate ?? 30)
+                    }
+                    title="Step forward (→)"
+                  >
+                    ⏩
+                  </button>
+                  <button
+                    className="icon-button"
+                    onClick={() => useTimelineStore.getState().goToEnd()}
+                    title="Go to end (End)"
+                  >
+                    ⏭
+                  </button>
+                  <div className="timecode">{formatTimecode(playhead)}</div>
                 </div>
               </div>
             </div>
@@ -107,36 +209,67 @@ function App() {
             <div className="timeline-container">
               <div className="timeline-toolbar">
                 <div className="timeline-toolbar__left">
-                  <button className="icon-button" title="Selection tool">↖️</button>
-                  <button className="icon-button" title="Razor tool">✂️</button>
-                  <button className="icon-button" title="Hand tool">✋</button>
+                  <button
+                    className="icon-button"
+                    onClick={() => useTimelineStore.getState().setActiveTool('select')}
+                    title="Selection tool (V)"
+                  >
+                    ↖️
+                  </button>
+                  <button
+                    className="icon-button"
+                    onClick={() => useTimelineStore.getState().setActiveTool('razor')}
+                    title="Razor tool (C)"
+                  >
+                    ✂️
+                  </button>
+                  <button
+                    className="icon-button"
+                    onClick={() => useTimelineStore.getState().setActiveTool('hand')}
+                    title="Hand tool (H)"
+                  >
+                    ✋
+                  </button>
                 </div>
                 <div className="timeline-toolbar__center">
-                  <button className="icon-button" title="Zoom out">-</button>
+                  <button
+                    className="icon-button"
+                    onClick={() => useTimelineStore.getState().zoomOut()}
+                    title="Zoom out (-)"
+                  >
+                    -
+                  </button>
                   <input
                     type="range"
                     className="zoom-slider"
-                    min="0.01"
-                    max="100"
-                    step="0.01"
-                    defaultValue="1"
+                    min="10"
+                    max="1000"
+                    step="10"
+                    value={useTimelineStore.getState().zoomLevel}
+                    onChange={(e) =>
+                      useTimelineStore.getState().setZoomLevel(Number(e.target.value))
+                    }
                   />
-                  <button className="icon-button" title="Zoom in">+</button>
+                  <button
+                    className="icon-button"
+                    onClick={() => useTimelineStore.getState().zoomIn()}
+                    title="Zoom in (+)"
+                  >
+                    +
+                  </button>
                 </div>
                 <div className="timeline-toolbar__right">
                   <label className="checkbox-label">
-                    <input type="checkbox" defaultChecked />
+                    <input
+                      type="checkbox"
+                      checked={timeline?.snapping.enabled ?? true}
+                      onChange={() => useTimelineStore.getState().toggleSnapping()}
+                    />
                     <span>Snapping</span>
                   </label>
                 </div>
               </div>
-              <div className="timeline">
-                <div className="empty-state">
-                  <div className="empty-state__icon">⏱️</div>
-                  <p className="empty-state__text">Timeline is empty</p>
-                  <p className="empty-state__hint">Drag media from the pool to get started</p>
-                </div>
-              </div>
+              <Timeline />
             </div>
           </div>
 
@@ -146,10 +279,18 @@ function App() {
               <h2 className="panel__title">Inspector</h2>
             </div>
             <div className="panel__content">
-              <div className="empty-state">
-                <div className="empty-state__icon">🔍</div>
-                <p className="empty-state__text">No clip selected</p>
-              </div>
+              {useTimelineStore.getState().selectedClips.length > 0 ? (
+                <div>
+                  <h3>Clip Properties</h3>
+                  <p>Selected: {useTimelineStore.getState().selectedClips.length} clip(s)</p>
+                </div>
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-state__icon">🔍</div>
+                  <p className="empty-state__text">No clip selected</p>
+                  <p className="empty-state__hint">Select a clip to view properties</p>
+                </div>
+              )}
             </div>
           </aside>
         </div>
@@ -158,13 +299,23 @@ function App() {
       {/* Status Bar */}
       <footer className="status-bar">
         <div className="status-bar__left">
-          <span className="status-item">Ready</span>
+          <span className="status-item">
+            {playing ? '▶️ Playing' : '⏸️ Ready'}
+          </span>
+          {timeline && (
+            <span className="status-item">
+              {timeline.tracks.filter((t) => t.clips.length > 0).length} tracks with clips
+            </span>
+          )}
         </div>
         <div className="status-bar__right">
-          <span className="status-item">1920x1080</span>
-          <span className="status-item">30 fps</span>
-          <span className="status-item">CPU: 0%</span>
-          <span className="status-item">RAM: 0 MB</span>
+          <span className="status-item">
+            {project?.settings.resolution.width}×{project?.settings.resolution.height}
+          </span>
+          <span className="status-item">{project?.settings.frameRate} fps</span>
+          <span className="status-item">
+            Zoom: {Math.round(useTimelineStore.getState().zoomLevel)}px/s
+          </span>
         </div>
       </footer>
     </div>

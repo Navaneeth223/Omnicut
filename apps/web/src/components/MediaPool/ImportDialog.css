@@ -1,0 +1,131 @@
+/**
+ * Import Dialog Styles
+ */
+
+.import-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.import-dialog {
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-normal);
+  border-radius: 8px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.import-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4);
+  border-bottom: 1px solid var(--border-normal);
+}
+
+.import-dialog__header h2 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+}
+
+.import-dialog__content {
+  padding: var(--space-6);
+  overflow-y: auto;
+}
+
+.import-dialog__drop-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8);
+  border: 2px dashed var(--border-normal);
+  border-radius: 8px;
+  background-color: var(--bg-tertiary);
+  margin-bottom: var(--space-6);
+  transition: all var(--transition-fast);
+}
+
+.import-dialog__drop-zone:hover {
+  border-color: var(--accent-blue);
+  background-color: var(--bg-hover);
+}
+
+.import-dialog__icon {
+  font-size: 64px;
+  margin-bottom: var(--space-3);
+  opacity: 0.5;
+}
+
+.import-dialog__text {
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--space-2);
+}
+
+.import-dialog__hint {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-4);
+}
+
+.import-dialog__info {
+  padding: var(--space-4);
+  background-color: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+.import-dialog__info h3 {
+  margin: 0 0 var(--space-3) 0;
+  font-size: var(--font-size-md);
+}
+
+.import-dialog__info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.import-dialog__info li {
+  padding: var(--space-2) 0;
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+}
+
+.import-dialog__info strong {
+  color: var(--text-primary);
+  margin-right: var(--space-2);
+}

@@ -1,0 +1,70 @@
+/**
+ * Media List Styles
+ */
+
+.media-list {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.media-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.media-list__table thead {
+  position: sticky;
+  top: 0;
+  background-color: var(--bg-tertiary);
+  z-index: 1;
+}
+
+.media-list__table th {
+  padding: var(--space-2) var(--space-3);
+  text-align: left;
+  font-weight: 600;
+  border-bottom: 1px solid var(--border-normal);
+  white-space: nowrap;
+}
+
+.media-list__row {
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.media-list__row:hover {
+  background-color: var(--bg-hover);
+}
+
+.media-list__row--selected {
+  background-color: var(--bg-active);
+}
+
+.media-list__table td {
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.media-list__name-cell {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.media-list__thumbnail {
+  width: 40px;
+  height: 24px;
+  object-fit: cover;
+  border-radius: 2px;
+}
+
+.media-list__name {
+  max-width: 300px;
+}
+
+.media-list__name span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
