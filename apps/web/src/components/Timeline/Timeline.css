@@ -265,3 +265,19 @@
   height: 100%;
   color: var(--text-secondary);
 }
+
+
+/* Drag and Drop Styles */
+.timeline-track--drag-over {
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 2px dashed rgba(59, 130, 246, 0.5);
+  box-sizing: border-box;
+}
+
+.media-grid__item[draggable="true"] {
+  cursor: grab;
+}
+
+.media-grid__item[draggable="true"]:active {
+  cursor: grabbing;
+}

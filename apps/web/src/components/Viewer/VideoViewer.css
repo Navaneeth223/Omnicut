@@ -1,0 +1,57 @@
+/**
+ * Video Viewer Styles
+ */
+
+.video-viewer {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #000;
+  position: relative;
+  overflow: hidden;
+}
+
+.video-viewer__empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.video-viewer__canvas,
+.video-viewer__image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.video-viewer__video {
+  display: none;
+}
+
+.video-viewer__audio {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.audio-visualizer {
+  text-align: center;
+  color: var(--text-secondary);
+}
+
+.audio-visualizer__icon {
+  font-size: 4rem;
+  margin-bottom: 1rem;
+  opacity: 0.5;
+}
+
+.audio-visualizer__text {
+  font-size: 1.2rem;
+  opacity: 0.7;
+}

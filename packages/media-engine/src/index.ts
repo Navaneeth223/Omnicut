@@ -9,6 +9,7 @@ export * from './ffmpeg-manager';
 
 // Export media importer
 export * from './media-importer';
+export * from './browser-importer';
 
 // Export utilities
 export * from './metadata-extractor';

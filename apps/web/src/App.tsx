@@ -11,6 +11,7 @@ import { ExportDialog } from './components/Export/ExportDialog';
 import { SettingsDialog } from './components/Settings/SettingsDialog';
 import { EffectsPanel } from './components/Effects/EffectsPanel';
 import { TransitionsPanel } from './components/Transitions/TransitionsPanel';
+import { VideoViewer } from './components/Viewer/VideoViewer';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -208,15 +209,7 @@ function App() {
             <div className="viewer-container">
               <div className="viewer">
                 <div className="viewer__canvas">
-                  <div className="empty-state">
-                    <div className="empty-state__icon">🎬</div>
-                    <p className="empty-state__text">Preview</p>
-                    <p className="empty-state__hint">
-                      {timeline && timeline.tracks.length > 0
-                        ? 'Press Space to play'
-                        : 'Add clips to timeline to preview'}
-                    </p>
-                  </div>
+                  <VideoViewer />
                 </div>
                 <div className="viewer__controls">
                   <button

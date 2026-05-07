@@ -70,6 +70,10 @@ export function MediaGrid({ items }: MediaGridProps) {
       id: generateId(),
       name: item.name,
       mediaItemId: item.id,
+      mediaUrl: item.url,
+      source: item.url,
+      type: item.type === 'image' ? 'video' : item.type,
+      trackId: targetTrack.id,
       startTime: timeline.playhead,
       duration: item.duration,
       trimStart: 0,
@@ -89,6 +93,15 @@ export function MediaGrid({ items }: MediaGridProps) {
     incrementUsageCount(item.id);
 
     console.log(`Added "${item.name}" to track "${targetTrack.name}" at ${timeline.playhead}s`);
+  };
+
+  const handleDragStart = (item: MediaItem, e: React.DragEvent) => {
+    // Store media item data for drop
+    e.dataTransfer.effectAllowed = 'copy';
+    e.dataTransfer.setData('application/json', JSON.stringify({
+      type: 'media-item',
+      item: item,
+    }));
   };
 
   const handleContextMenu = (itemId: string, e: React.MouseEvent) => {
@@ -159,9 +172,11 @@ export function MediaGrid({ items }: MediaGridProps) {
           className={`media-grid__item ${
             selectedItems.includes(item.id) ? 'media-grid__item--selected' : ''
           }`}
+          draggable
           onClick={(e) => handleClick(item.id, e)}
           onDoubleClick={() => handleDoubleClick(item)}
           onContextMenu={(e) => handleContextMenu(item.id, e)}
+          onDragStart={(e) => handleDragStart(item, e)}
         >
           {/* Thumbnail */}
           <div className="media-grid__thumbnail">
