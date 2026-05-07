@@ -9,6 +9,7 @@ import { ErrorBoundary } from './ErrorBoundary';
 import App from './App';
 import './styles/design-tokens.css';
 import './styles/index.css';
+import './styles/responsive.css';
 
 // Create React Query client
 const queryClient = new QueryClient({

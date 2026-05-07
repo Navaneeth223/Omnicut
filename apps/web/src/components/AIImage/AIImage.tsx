@@ -103,8 +103,8 @@ interface GeneratedImage {
 export function AIImage() {
   const [prompt, setPrompt] = useState('');
   const [negativePrompt, setNegativePrompt] = useState('');
-  const [selectedBackend, setSelectedBackend] = useState<ImageBackend>(IMAGE_BACKENDS[0]);
-  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(ASPECT_RATIOS[0]);
+  const [selectedBackend, setSelectedBackend] = useState<ImageBackend>(IMAGE_BACKENDS[0]!);
+  const [selectedAspectRatio, setSelectedAspectRatio] = useState<AspectRatio>(ASPECT_RATIOS[0]!);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedImages, setGeneratedImages] = useState<GeneratedImage[]>([]);
   const [selectedImage, setSelectedImage] = useState<GeneratedImage | null>(null);
@@ -144,7 +144,7 @@ export function AIImage() {
             prompt,
             negativePrompt,
             selectedAspectRatio,
-            apiKeys[selectedBackend.id]
+            apiKeys[selectedBackend.id] || ''
           );
           break;
 
@@ -154,7 +154,7 @@ export function AIImage() {
             prompt,
             negativePrompt,
             selectedAspectRatio,
-            apiKeys[selectedBackend.id]
+            apiKeys[selectedBackend.id] || ''
           );
           break;
 
@@ -165,7 +165,7 @@ export function AIImage() {
 
         case 'deepai':
           // DeepAI
-          imageUrl = await generateWithDeepAI(prompt, apiKeys[selectedBackend.id]);
+          imageUrl = await generateWithDeepAI(prompt, apiKeys[selectedBackend.id] || '');
           break;
 
         case 'stability':
@@ -174,7 +174,7 @@ export function AIImage() {
             prompt,
             negativePrompt,
             selectedAspectRatio,
-            apiKeys[selectedBackend.id]
+            apiKeys[selectedBackend.id] || ''
           );
           break;
 
@@ -216,11 +216,13 @@ export function AIImage() {
         path: image.url,
         url: image.url,
         size: 0,
+        mimeType: 'image/png',
         thumbnail: image.url,
         importedAt: new Date(),
         tags: ['ai-generated', 'image', selectedBackend.id],
         rating: 0,
         usageCount: 0,
+        metadata: {},
       };
 
       addMediaItem(item);
@@ -265,12 +267,12 @@ export function AIImage() {
 
       {/* Progress Steps */}
       <div className="ai-image__steps">
-        <div className={`step ${step === 'prompt' ? 'step--active' : step !== 'prompt' ? 'step--complete' : ''}`}>
+        <div className={`step ${step === 'prompt' ? 'step--active' : (step === 'settings' || step === 'generate' || step === 'results') ? 'step--complete' : ''}`}>
           <div className="step__number">1</div>
           <div className="step__label">Prompt</div>
         </div>
         <div className="step__line" />
-        <div className={`step ${step === 'settings' ? 'step--active' : ['generate', 'results'].includes(step) ? 'step--complete' : ''}`}>
+        <div className={`step ${step === 'settings' ? 'step--active' : (step === 'generate' || step === 'results') ? 'step--complete' : ''}`}>
           <div className="step__number">2</div>
           <div className="step__label">Settings</div>
         </div>
@@ -632,15 +634,74 @@ async function generateWithReplicate(
   aspectRatio: AspectRatio,
   apiKey: string
 ): Promise<string> {
-  // Replicate API implementation
-  // This is a simplified version - full implementation would use their prediction API
-  throw new Error('Replicate integration requires full API implementation');
+  // Replicate API - SDXL model
+  const response = await fetch('https://api.replicate.com/v1/predictions', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Token ${apiKey}`,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      version: 'stability-ai/sdxl:39ed52f2a78e934b3ba6e2a89f5b1c712de7dfea535525255b1aa35c5565e08b',
+      input: {
+        prompt: prompt,
+        negative_prompt: negativePrompt,
+        width: aspectRatio.width,
+        height: aspectRatio.height,
+        num_outputs: 1,
+      },
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Replicate API error: ${response.statusText}`);
+  }
+
+  const prediction = await response.json();
+  
+  // Poll for completion
+  let result = prediction;
+  while (result.status !== 'succeeded' && result.status !== 'failed') {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const pollResponse = await fetch(`https://api.replicate.com/v1/predictions/${result.id}`, {
+      headers: {
+        'Authorization': `Token ${apiKey}`,
+      },
+    });
+    result = await pollResponse.json();
+  }
+
+  if (result.status === 'failed') {
+    throw new Error('Replicate generation failed');
+  }
+
+  return result.output[0];
 }
 
 async function generateWithCraiyon(prompt: string): Promise<string> {
-  // Craiyon (DALL-E Mini) - free but slower
-  // This would require their API endpoint
-  throw new Error('Craiyon integration requires API endpoint');
+  // Craiyon (DALL-E Mini) API
+  const response = await fetch('https://backend.craiyon.com/generate', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      prompt: prompt,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Craiyon API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  
+  // Craiyon returns base64 images
+  if (data.images && data.images.length > 0) {
+    return `data:image/jpeg;base64,${data.images[0]}`;
+  }
+  
+  throw new Error('No image generated');
 }
 
 async function generateWithDeepAI(prompt: string, apiKey: string): Promise<string> {
@@ -669,6 +730,42 @@ async function generateWithStability(
   aspectRatio: AspectRatio,
   apiKey: string
 ): Promise<string> {
-  // Stability AI implementation
-  throw new Error('Stability AI integration requires full API implementation');
+  // Stability AI - SDXL
+  const response = await fetch('https://api.stability.ai/v1/generation/stable-diffusion-xl-1024-v1-0/text-to-image', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiKey}`,
+      'Content-Type': 'application/json',
+      'Accept': 'application/json',
+    },
+    body: JSON.stringify({
+      text_prompts: [
+        {
+          text: prompt,
+          weight: 1,
+        },
+        {
+          text: negativePrompt,
+          weight: -1,
+        },
+      ],
+      cfg_scale: 7,
+      height: aspectRatio.height,
+      width: aspectRatio.width,
+      samples: 1,
+      steps: 30,
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error(`Stability AI API error: ${response.statusText}`);
+  }
+
+  const data = await response.json();
+  
+  if (data.artifacts && data.artifacts.length > 0) {
+    return `data:image/png;base64,${data.artifacts[0].base64}`;
+  }
+  
+  throw new Error('No image generated');
 }

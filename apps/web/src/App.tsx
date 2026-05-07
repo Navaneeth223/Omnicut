@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { useProjectStore, useTimelineStore, useMediaPoolStore, useHistoryStore } from '@omnicut/store';
 import { VERSION, createDefaultProject, generateId } from '@omnicut/core';
 import { Header } from './components/Header/Header';
+import { MenuBar } from './components/Menu/MenuBar';
 import { MediaPool } from './components/MediaPool/MediaPool';
 import { Timeline } from './components/Timeline/Timeline';
 import { ExportDialog } from './components/Export/ExportDialog';
@@ -15,13 +16,18 @@ import { TransitionsPanel } from './components/Transitions/TransitionsPanel';
 import { VideoViewer } from './components/Viewer/VideoViewer';
 import { ShortsStudio } from './components/ShortsStudio/ShortsStudio';
 import { AIVoice } from './components/AIVoice/AIVoice';
+import { AIImage } from './components/AIImage/AIImage';
+import { AIVideo } from './components/AIVideo/AIVideo';
+import { ColorGrading } from './components/ColorGrading/ColorGrading';
+import { AudioWorkspace } from './components/AudioWorkspace/AudioWorkspace';
+import { PhotoEditor } from './components/PhotoEditor/PhotoEditor';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
 import './styles/App.css';
 
 function App() {
-  const [workspace, setWorkspace] = useState<'edit' | 'shorts' | 'ai-voice' | 'ai-video' | 'color' | 'audio' | 'photo'>('shorts');
+  const [workspace, setWorkspace] = useState<'edit' | 'shorts' | 'ai-voice' | 'ai-image' | 'ai-video' | 'color' | 'audio' | 'photo'>('shorts');
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showAutoSaveIndicator, setShowAutoSaveIndicator] = useState(false);
@@ -168,23 +174,44 @@ function App() {
         onSettings={() => setShowSettingsDialog(true)}
       />
 
+      {/* Menu Bar (File, Edit, View, Help, About) */}
+      {workspace === 'edit' && (
+        <MenuBar
+          onExport={() => setShowExportDialog(true)}
+          onSettings={() => setShowSettingsDialog(true)}
+          onImportMedia={() => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.multiple = true;
+            input.accept = 'video/*,audio/*,image/*';
+            input.onchange = (e) => {
+              const files = (e.target as HTMLInputElement).files;
+              if (files) {
+                // Handle file import
+                console.log('Import files:', files);
+              }
+            };
+            input.click();
+          }}
+        />
+      )}
+
       {/* Main Content */}
       <main className="main-content">
         {workspace === 'shorts' ? (
           <ShortsStudio />
         ) : workspace === 'ai-voice' ? (
           <AIVoice />
+        ) : workspace === 'ai-image' ? (
+          <AIImage />
         ) : workspace === 'ai-video' ? (
-          <div className="coming-soon">
-            <div className="coming-soon__icon">🤖</div>
-            <h2 className="coming-soon__title">AI Video Generation</h2>
-            <p className="coming-soon__text">
-              Generate videos from text prompts using AI. Coming soon!
-            </p>
-            <p className="coming-soon__hint">
-              This will integrate with services like Runway ML, Pika Labs, or Stable Video Diffusion
-            </p>
-          </div>
+          <AIVideo />
+        ) : workspace === 'color' ? (
+          <ColorGrading />
+        ) : workspace === 'audio' ? (
+          <AudioWorkspace />
+        ) : workspace === 'photo' ? (
+          <PhotoEditor />
         ) : (
           <div className="layout">
           {/* Left Panel - Media Pool */}
@@ -359,7 +386,7 @@ function App() {
           </span>
           {timeline && (
             <span className="status-item">
-              {timeline.tracks.filter((t) => t.clips.length > 0).length} tracks with clips
+              {timeline.tracks.filter((t: any) => t.clips.length > 0).length} tracks with clips
             </span>
           )}
           {autoSave.enabled && (

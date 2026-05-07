@@ -1,5 +1,5 @@
 /**
- * Effects Panel Styles - Premium Design
+ * Effects Panel Styles - Premium Design with Better Scrolling
  */
 
 .effects-panel {
@@ -11,6 +11,7 @@
 }
 
 .effects-panel__header {
+  flex-shrink: 0;
   padding: var(--sp-4);
   border-bottom: 1px solid var(--border-faint);
   box-shadow: var(--shadow-panel);
@@ -27,6 +28,7 @@
 
 /* Search */
 .effects-panel__search {
+  flex-shrink: 0;
   padding: var(--sp-3) var(--sp-4);
   border-bottom: 1px solid var(--border-faint);
 }
@@ -46,6 +48,74 @@
   background-repeat: no-repeat;
   background-position: 10px center;
   background-size: 14px;
+}
+
+.search-input:focus {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* Categories - Make scrollable */
+.effects-panel__categories {
+  flex-shrink: 0;
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-3) var(--sp-4);
+  border-bottom: 1px solid var(--border-faint);
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: thin;
+}
+
+.effects-panel__categories::-webkit-scrollbar {
+  height: 4px;
+}
+
+.effects-panel__categories::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.effects-panel__categories::-webkit-scrollbar-thumb {
+  background: var(--border-normal);
+  border-radius: var(--radius-full);
+}
+
+/* Browser Section - Make properly scrollable */
+.effects-panel__browser {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--sp-4);
+  min-height: 0; /* Important for flex scrolling */
+}
+
+.effects-panel__section-title {
+  margin: 0 0 var(--sp-3) 0;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* Applied Effects Section - Make properly scrollable */
+.effects-panel__applied {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--sp-4);
+  border-top: 1px solid var(--border-faint);
+  min-height: 0; /* Important for flex scrolling */
+  max-height: 50%; /* Limit to half the panel */
+}
+
+/* No Selection State */
+.effects-panel__no-selection {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--sp-6);
 }
 
 .search-input:focus {

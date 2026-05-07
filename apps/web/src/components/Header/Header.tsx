@@ -15,10 +15,11 @@ interface HeaderProps {
 
 const WORKSPACES = [
   { id: 'shorts', label: 'AI Shorts', icon: '🎬' },
+  { id: 'ai-image', label: 'AI Image', icon: '🎨' },
   { id: 'ai-voice', label: 'AI Voice', icon: '🎙️' },
   { id: 'ai-video', label: 'AI Video', icon: '🤖' },
   { id: 'edit', label: 'Edit', icon: '✂️' },
-  { id: 'color', label: 'Color', icon: '🎨' },
+  { id: 'color', label: 'Color', icon: '🌈' },
   { id: 'audio', label: 'Audio', icon: '🎵' },
   { id: 'photo', label: 'Photo', icon: '📷' },
 ];

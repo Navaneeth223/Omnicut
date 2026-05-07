@@ -1,0 +1,549 @@
+/**
+ * Responsive Design System
+ * Mobile-first approach with breakpoints from 320px to 2560px
+ */
+
+/* ── Breakpoints ─────────────────────────────── */
+:root {
+  --breakpoint-xs: 320px;   /* Mobile portrait */
+  --breakpoint-sm: 640px;   /* Mobile landscape */
+  --breakpoint-md: 768px;   /* Tablet portrait */
+  --breakpoint-lg: 1024px;  /* Tablet landscape / Small desktop */
+  --breakpoint-xl: 1280px;  /* Desktop */
+  --breakpoint-2xl: 1536px; /* Large desktop */
+  --breakpoint-3xl: 1920px; /* Full HD */
+  --breakpoint-4xl: 2560px; /* 2K/4K */
+}
+
+/* ── Mobile First (320px - 639px) ─────────────── */
+@media (max-width: 639px) {
+  /* Hide desktop header, show mobile header */
+  .app-header {
+    display: none;
+  }
+
+  /* Stack layout vertically */
+  .layout {
+    flex-direction: column;
+  }
+
+  /* Full width panels */
+  .panel--left,
+  .panel--right {
+    width: 100%;
+    min-width: 100%;
+    max-width: 100%;
+    height: 50vh;
+    border: none;
+    border-bottom: 1px solid var(--border-faint);
+  }
+
+  /* Viewer takes full width */
+  .viewer-container {
+    height: 40vh;
+  }
+
+  /* Timeline takes remaining space */
+  .timeline-container {
+    height: 60vh;
+  }
+
+  /* Hide menu bar on mobile */
+  .menu-bar {
+    display: none;
+  }
+
+  /* Mobile bottom navigation */
+  .mobile-nav {
+    display: flex;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-panel);
+    border-top: 1px solid var(--border-faint);
+    padding: var(--sp-2);
+    z-index: 1000;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .mobile-nav__button {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: var(--sp-2);
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 10px;
+    cursor: pointer;
+    transition: all var(--duration-fast);
+  }
+
+  .mobile-nav__button--active {
+    color: var(--accent-1);
+  }
+
+  .mobile-nav__icon {
+    font-size: 20px;
+  }
+
+  /* Workspace tabs - horizontal scroll */
+  .workspace-tabs {
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: var(--sp-1);
+    padding: var(--sp-2);
+  }
+
+  .workspace-tab {
+    min-width: 80px;
+    padding: var(--sp-2) var(--sp-3);
+    font-size: 11px;
+  }
+
+  .workspace-tab__icon {
+    font-size: 16px;
+  }
+
+  /* Effects grid - 2 columns on mobile */
+  .effects-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--sp-2);
+  }
+
+  /* Smaller effect cards */
+  .effect-card {
+    padding: var(--sp-2);
+  }
+
+  .effect-card__icon {
+    font-size: 24px;
+  }
+
+  .effect-card__name {
+    font-size: 9px;
+  }
+
+  /* Timeline zoom controls */
+  .timeline-toolbar {
+    flex-wrap: wrap;
+    gap: var(--sp-1);
+  }
+
+  .timeline-toolbar__center {
+    width: 100%;
+    order: 3;
+  }
+
+  /* Smaller buttons */
+  .button {
+    padding: 6px 12px;
+    font-size: 11px;
+  }
+
+  .icon-button {
+    width: 28px;
+    height: 28px;
+    font-size: 14px;
+  }
+}
+
+/* ── Tablet Portrait (640px - 767px) ──────────── */
+@media (min-width: 640px) and (max-width: 767px) {
+  /* Show simplified header */
+  .app-header {
+    padding: var(--sp-2) var(--sp-4);
+  }
+
+  .app-logo {
+    width: 24px;
+    height: 24px;
+  }
+
+  .app-title {
+    font-size: 16px;
+  }
+
+  /* Workspace tabs scroll */
+  .workspace-tabs {
+    overflow-x: auto;
+    gap: var(--sp-2);
+  }
+
+  .workspace-tab {
+    min-width: 90px;
+  }
+
+  /* 2-column layout */
+  .layout {
+    flex-direction: column;
+  }
+
+  .panel--left {
+    width: 100%;
+    height: 30vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border-faint);
+  }
+
+  .center-area {
+    height: 50vh;
+  }
+
+  .panel--right {
+    width: 100%;
+    height: 20vh;
+    border-left: none;
+    border-top: 1px solid var(--border-faint);
+  }
+
+  /* Effects grid - 3 columns */
+  .effects-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── Tablet Landscape (768px - 1023px) ────────── */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Narrower panels */
+  .panel--left {
+    width: 240px;
+    min-width: 240px;
+  }
+
+  .panel--right {
+    width: 280px;
+    min-width: 280px;
+  }
+
+  /* Workspace tabs */
+  .workspace-tab {
+    padding: var(--sp-2) var(--sp-3);
+    font-size: 11px;
+  }
+
+  /* Effects grid - 2 columns */
+  .effects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Viewer split */
+  .viewer-container {
+    height: 45%;
+  }
+
+  .timeline-container {
+    height: 55%;
+  }
+}
+
+/* ── Desktop (1024px - 1279px) ────────────────── */
+@media (min-width: 1024px) and (max-width: 1279px) {
+  /* Standard desktop layout */
+  .panel--left {
+    width: 280px;
+    min-width: 280px;
+  }
+
+  .panel--right {
+    width: 320px;
+    min-width: 320px;
+  }
+
+  /* Effects grid - 2 columns */
+  .effects-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* ── Large Desktop (1280px - 1535px) ──────────── */
+@media (min-width: 1280px) and (max-width: 1535px) {
+  /* Comfortable desktop layout */
+  .panel--left {
+    width: 300px;
+    min-width: 300px;
+  }
+
+  .panel--right {
+    width: 340px;
+    min-width: 340px;
+  }
+
+  /* Effects grid - 3 columns */
+  .effects-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* ── XL Desktop (1536px - 1919px) ─────────────── */
+@media (min-width: 1536px) and (max-width: 1919px) {
+  /* Spacious layout */
+  .panel--left {
+    width: 320px;
+    min-width: 320px;
+  }
+
+  .panel--right {
+    width: 360px;
+    min-width: 360px;
+  }
+
+  /* Effects grid - 3 columns */
+  .effects-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  /* Larger text */
+  body {
+    font-size: 13px;
+  }
+}
+
+/* ── Full HD (1920px - 2559px) ────────────────── */
+@media (min-width: 1920px) and (max-width: 2559px) {
+  /* Full HD optimized */
+  .panel--left {
+    width: 360px;
+    min-width: 360px;
+  }
+
+  .panel--right {
+    width: 400px;
+    min-width: 400px;
+  }
+
+  /* Effects grid - 4 columns */
+  .effects-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  /* Larger UI elements */
+  .button {
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+
+  .icon-button {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ── 2K/4K (2560px+) ──────────────────────────── */
+@media (min-width: 2560px) {
+  /* Ultra-wide optimized */
+  .panel--left {
+    width: 400px;
+    min-width: 400px;
+  }
+
+  .panel--right {
+    width: 440px;
+    min-width: 440px;
+  }
+
+  /* Effects grid - 5 columns */
+  .effects-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  /* Larger everything */
+  body {
+    font-size: 14px;
+  }
+
+  .button {
+    padding: 12px 24px;
+    font-size: 14px;
+  }
+
+  .icon-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  /* More spacing */
+  :root {
+    --sp-1: 6px;
+    --sp-2: 12px;
+    --sp-3: 18px;
+    --sp-4: 24px;
+  }
+}
+
+/* ── Touch Device Optimizations ───────────────── */
+@media (hover: none) and (pointer: coarse) {
+  /* Larger touch targets */
+  .button,
+  .icon-button,
+  .menu-button,
+  .workspace-tab {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Larger sliders */
+  .parameter-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  .parameter-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Remove hover effects */
+  .effect-card:hover,
+  .button:hover,
+  .icon-button:hover {
+    transform: none;
+  }
+
+  /* Tap feedback */
+  .effect-card:active,
+  .button:active,
+  .icon-button:active {
+    transform: scale(0.95);
+    opacity: 0.8;
+  }
+}
+
+/* ── Landscape Orientation ────────────────────── */
+@media (orientation: landscape) and (max-height: 600px) {
+  /* Compact vertical layout */
+  .viewer-container {
+    height: 40%;
+  }
+
+  .timeline-container {
+    height: 60%;
+  }
+
+  /* Hide some UI elements */
+  .app-version {
+    display: none;
+  }
+
+  .status-bar {
+    height: 24px;
+    font-size: 10px;
+  }
+}
+
+/* ── High DPI Displays ────────────────────────── */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Sharper borders */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Thinner borders */
+  .border,
+  [class*="border"] {
+    border-width: 0.5px;
+  }
+}
+
+/* ── Reduced Motion ───────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Dark Mode (System Preference) ────────────── */
+@media (prefers-color-scheme: dark) {
+  /* Already dark by default */
+}
+
+/* ── Light Mode (Future) ──────────────────────── */
+@media (prefers-color-scheme: light) {
+  /* Light mode variables would go here */
+  /* Currently not implemented */
+}
+
+/* ── Print Styles ─────────────────────────────── */
+@media print {
+  /* Hide UI elements */
+  .app-header,
+  .menu-bar,
+  .status-bar,
+  .panel--left,
+  .panel--right,
+  .timeline-toolbar {
+    display: none !important;
+  }
+
+  /* Show only viewer */
+  .viewer-container {
+    height: 100vh;
+    width: 100vw;
+  }
+}
+
+/* ── Mobile Navigation (Hidden on Desktop) ────── */
+.mobile-nav {
+  display: none;
+}
+
+@media (max-width: 767px) {
+  .mobile-nav {
+    display: flex;
+  }
+
+  /* Add padding to content for mobile nav */
+  .app {
+    padding-bottom: 60px;
+  }
+}
+
+/* ── Utility Classes for Responsive ───────────── */
+.hide-mobile {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .hide-mobile {
+    display: block;
+  }
+}
+
+.hide-desktop {
+  display: block;
+}
+
+@media (min-width: 768px) {
+  .hide-desktop {
+    display: none;
+  }
+}
+
+.show-tablet-up {
+  display: none;
+}
+
+@media (min-width: 768px) {
+  .show-tablet-up {
+    display: block;
+  }
+}
+
+.show-desktop-up {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .show-desktop-up {
+    display: block;
+  }
+}
