@@ -8,6 +8,8 @@ export default defineConfig({
     alias: {
       '@': path.resolve(__dirname, './src'),
       '@omnicut/core': path.resolve(__dirname, '../../packages/core/src'),
+      '@omnicut/store': path.resolve(__dirname, '../../packages/store/src'),
+      '@omnicut/media-engine': path.resolve(__dirname, '../../packages/media-engine/src'),
     },
   },
   server: {
