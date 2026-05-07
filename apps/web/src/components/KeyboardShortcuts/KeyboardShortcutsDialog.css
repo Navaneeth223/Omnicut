@@ -1,0 +1,220 @@
+/**
+ * Keyboard Shortcuts Dialog Styles
+ */
+
+.keyboard-shortcuts-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fade-in 0.2s ease;
+  padding: var(--sp-4);
+}
+
+.keyboard-shortcuts-dialog {
+  width: 100%;
+  max-width: 900px;
+  max-height: 90vh;
+  background: var(--bg-panel);
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  animation: slide-up 0.3s var(--ease-spring);
+}
+
+@keyframes slide-up {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Header */
+.keyboard-shortcuts-dialog__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--sp-4) var(--sp-6);
+  border-bottom: 1px solid var(--border-faint);
+}
+
+.keyboard-shortcuts-dialog__title {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.keyboard-shortcuts-dialog__close {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  font-size: 20px;
+  cursor: pointer;
+  transition: all var(--duration-fast);
+}
+
+.keyboard-shortcuts-dialog__close:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* Content */
+.keyboard-shortcuts-dialog__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-6);
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: var(--sp-6);
+}
+
+.shortcuts-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-3);
+}
+
+.shortcuts-section__title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding-bottom: var(--sp-2);
+  border-bottom: 2px solid var(--border-subtle);
+}
+
+.shortcuts-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.shortcut-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--sp-4);
+  padding: var(--sp-2);
+  background: var(--bg-surface);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast);
+}
+
+.shortcut-item:hover {
+  background: var(--bg-hover);
+}
+
+.shortcut-item__keys {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+}
+
+.shortcut-key {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  height: 28px;
+  padding: 0 var(--sp-2);
+  background: var(--bg-panel);
+  border: 2px solid var(--border-subtle);
+  border-bottom-width: 3px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-transform: uppercase;
+  box-shadow: 0 2px 0 var(--border-subtle);
+}
+
+.shortcut-plus {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  margin: 0 2px;
+}
+
+.shortcut-item__description {
+  flex: 1;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+/* Footer */
+.keyboard-shortcuts-dialog__footer {
+  padding: var(--sp-4) var(--sp-6);
+  border-top: 1px solid var(--border-faint);
+  background: var(--bg-surface);
+}
+
+.keyboard-shortcuts-dialog__hint {
+  font-size: 13px;
+  color: var(--text-tertiary);
+  margin: 0;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .keyboard-shortcuts-dialog__content {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .keyboard-shortcuts-overlay {
+    padding: var(--sp-2);
+  }
+
+  .keyboard-shortcuts-dialog {
+    max-height: 95vh;
+  }
+
+  .keyboard-shortcuts-dialog__header {
+    padding: var(--sp-3) var(--sp-4);
+  }
+
+  .keyboard-shortcuts-dialog__title {
+    font-size: 20px;
+  }
+
+  .keyboard-shortcuts-dialog__content {
+    padding: var(--sp-4);
+    gap: var(--sp-4);
+  }
+
+  .shortcut-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--sp-2);
+  }
+
+  .shortcut-item__keys {
+    width: 100%;
+  }
+}

@@ -1,0 +1,51 @@
+/**
+ * Loading Components
+ * Spinners and skeleton screens
+ */
+
+import './Loading.css';
+
+export function Spinner({ size = 'medium' }: { size?: 'small' | 'medium' | 'large' }) {
+  return (
+    <div className={`spinner spinner--${size}`}>
+      <div className="spinner__circle" />
+    </div>
+  );
+}
+
+export function LoadingOverlay({ message }: { message?: string }) {
+  return (
+    <div className="loading-overlay">
+      <div className="loading-overlay__content">
+        <Spinner size="large" />
+        {message && <p className="loading-overlay__message">{message}</p>}
+      </div>
+    </div>
+  );
+}
+
+export function SkeletonText({ width = '100%' }: { width?: string }) {
+  return <div className="skeleton skeleton--text" style={{ width }} />;
+}
+
+export function SkeletonCard() {
+  return (
+    <div className="skeleton-card">
+      <div className="skeleton skeleton--image" />
+      <div className="skeleton-card__content">
+        <SkeletonText width="80%" />
+        <SkeletonText width="60%" />
+      </div>
+    </div>
+  );
+}
+
+export function LoadingDots() {
+  return (
+    <div className="loading-dots">
+      <span className="loading-dots__dot" />
+      <span className="loading-dots__dot" />
+      <span className="loading-dots__dot" />
+    </div>
+  );
+}
