@@ -29,6 +29,12 @@ importers:
       '@omnicut/core':
         specifier: workspace:*
         version: link:../../packages/core
+      '@omnicut/media-engine':
+        specifier: workspace:*
+        version: link:../../packages/media-engine
+      '@omnicut/store':
+        specifier: workspace:*
+        version: link:../../packages/store
       '@tanstack/react-query':
         specifier: ^5.17.0
         version: 5.100.9(react@18.3.1)

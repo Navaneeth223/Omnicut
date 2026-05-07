@@ -1,16 +1,18 @@
 /**
  * Video Viewer Component
- * Displays video/image/audio with playback controls
+ * Displays video/image/audio with playback controls and effect preview
  */
 
 import { useEffect, useRef, useState } from 'react';
 import { useTimelineStore } from '@omnicut/store';
+import { createEffectPreviewRenderer } from '../../utils/effectPreview';
 import type { Clip } from '@omnicut/core';
 import './VideoViewer.css';
 
 export function VideoViewer() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const effectRendererRef = useRef(createEffectPreviewRenderer());
   const [currentMedia, setCurrentMedia] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'video' | 'audio' | 'image' | null>(null);
 
@@ -93,28 +95,33 @@ export function VideoViewer() {
   }, [playhead, playing, mediaType]);
 
   /**
-   * Render to canvas (for effects in the future)
+   * Render to canvas with effects
    */
   useEffect(() => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
     
-    if (!canvas || !video || mediaType !== 'video') return;
+    if (!canvas || !video || mediaType !== 'video') {
+      effectRendererRef.current.stop();
+      return;
+    }
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
+    const clip = getCurrentClip();
+    if (!clip) {
+      effectRendererRef.current.stop();
+      return;
+    }
 
-    const render = () => {
-      if (video.readyState >= 2) {
-        canvas.width = video.videoWidth || 1920;
-        canvas.height = video.videoHeight || 1080;
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      }
-      requestAnimationFrame(render);
+    // Get effects for current clip
+    const effects = clip.effects || [];
+
+    // Start effect rendering
+    effectRendererRef.current.start(video, canvas, effects);
+
+    return () => {
+      effectRendererRef.current.stop();
     };
-
-    render();
-  }, [mediaType, currentMedia]);
+  }, [playhead, mediaType, currentMedia, timeline]);
 
   return (
     <div className="video-viewer">

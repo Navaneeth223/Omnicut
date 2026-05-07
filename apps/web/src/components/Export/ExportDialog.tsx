@@ -5,6 +5,7 @@
 
 import { useState } from 'react';
 import { useProjectStore, useTimelineStore } from '@omnicut/store';
+import { renderTimeline, estimateFileSize } from '@omnicut/media-engine';
 import type { ExportSettings } from '@omnicut/core';
 import './ExportDialog.css';
 
@@ -58,17 +59,36 @@ export function ExportDialog({ onClose }: ExportDialogProps) {
     setError(null);
 
     try {
-      // TODO: Implement actual export with FFmpeg.wasm
-      // For now, simulate export progress
-      for (let i = 0; i <= 100; i += 10) {
-        await new Promise((resolve) => setTimeout(resolve, 500));
-        setProgress(i);
-      }
+      // Render timeline with FFmpeg
+      const result = await renderTimeline(timeline, {
+        format: settings.format,
+        codec: settings.codec,
+        resolution: settings.resolution,
+        frameRate: settings.frameRate,
+        quality: settings.quality,
+        audioBitrate: settings.audioBitrate,
+        videoBitrate: settings.bitrate,
+        onProgress: (p) => setProgress(Math.round(p * 100)),
+      });
 
-      console.log('Export settings:', settings);
-      alert('Export complete! (Simulated - FFmpeg integration coming soon)');
-      onClose();
+      if (result.success && result.blob) {
+        // Download the exported video
+        const url = URL.createObjectURL(result.blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${project?.name || 'video'}.${settings.format}`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        alert(`Export complete! Duration: ${(result.duration! / 1000).toFixed(1)}s`);
+        onClose();
+      } else {
+        throw new Error(result.error || 'Export failed');
+      }
     } catch (err) {
+      console.error('Export error:', err);
       setError(err instanceof Error ? err.message : 'Export failed');
     } finally {
       setExporting(false);
@@ -76,11 +96,18 @@ export function ExportDialog({ onClose }: ExportDialogProps) {
   };
 
   const estimatedFileSize = () => {
-    const duration = settings.endTime - settings.startTime;
-    const videoBitrate = settings.bitrate * 1000; // Convert to bits
-    const audioBitrate = settings.audioBitrate * 1000;
-    const totalBitrate = videoBitrate + audioBitrate;
-    const sizeInBytes = (totalBitrate * duration) / 8;
+    if (!timeline) return '0.00';
+    
+    const sizeInBytes = estimateFileSize(timeline, {
+      format: settings.format,
+      codec: settings.codec,
+      resolution: settings.resolution,
+      frameRate: settings.frameRate,
+      quality: settings.quality,
+      audioBitrate: settings.audioBitrate,
+      videoBitrate: settings.bitrate,
+    });
+    
     const sizeInMB = sizeInBytes / (1024 * 1024);
     return sizeInMB.toFixed(2);
   };

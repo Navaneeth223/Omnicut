@@ -163,6 +163,35 @@ export interface HDRMetadata {
 }
 
 /**
+ * Export settings for dialog
+ */
+export interface ExportSettings {
+  /** Output format */
+  format: 'mp4' | 'webm' | 'mov';
+  /** Video codec */
+  codec: 'h264' | 'h265' | 'vp9' | 'av1';
+  /** Output resolution */
+  resolution: {
+    width: number;
+    height: number;
+  };
+  /** Frame rate */
+  frameRate: number;
+  /** Video bitrate in kbps */
+  bitrate: number;
+  /** Quality preset */
+  quality: 'low' | 'medium' | 'high' | 'ultra';
+  /** Audio codec */
+  audioCodec: 'aac' | 'mp3' | 'opus';
+  /** Audio bitrate in kbps */
+  audioBitrate: number;
+  /** Start time in seconds */
+  startTime: number;
+  /** End time in seconds */
+  endTime: number;
+}
+
+/**
  * Export job
  */
 export interface ExportJob {

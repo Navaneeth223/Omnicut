@@ -5,103 +5,15 @@
 
 import { useState } from 'react';
 import { useTimelineStore } from '@omnicut/store';
-import type { Effect, EffectType, EffectCategory } from '@omnicut/core';
+import type { Effect, EffectParameter, EffectCategory } from '@omnicut/core';
 import { generateId } from '@omnicut/core';
 import {
   createAddEffectCommand,
   createRemoveEffectCommand,
   createUpdateEffectParameterCommand,
 } from '../../utils/commands';
+import { ALL_EFFECTS, type EffectDefinition } from './effectDefinitions';
 import './EffectsPanel.css';
-
-interface EffectDefinition {
-  type: EffectType;
-  name: string;
-  category: EffectCategory;
-  icon: string;
-  description: string;
-}
-
-// 10 Basic Effects
-const BASIC_EFFECTS: EffectDefinition[] = [
-  // Color Effects
-  {
-    type: 'brightness_contrast',
-    name: 'Brightness & Contrast',
-    category: 'color',
-    icon: '☀️',
-    description: 'Adjust brightness and contrast',
-  },
-  {
-    type: 'hue_saturation',
-    name: 'Hue & Saturation',
-    category: 'color',
-    icon: '🎨',
-    description: 'Adjust hue, saturation, and lightness',
-  },
-  {
-    type: 'exposure',
-    name: 'Exposure',
-    category: 'color',
-    icon: '📸',
-    description: 'Adjust exposure and gamma',
-  },
-  
-  // Blur Effects
-  {
-    type: 'gaussian_blur',
-    name: 'Gaussian Blur',
-    category: 'blur',
-    icon: '🌫️',
-    description: 'Apply smooth blur effect',
-  },
-  {
-    type: 'sharpen',
-    name: 'Sharpen',
-    category: 'blur',
-    icon: '🔪',
-    description: 'Enhance edge definition',
-  },
-  
-  // Stylize Effects
-  {
-    type: 'vignette',
-    name: 'Vignette',
-    category: 'stylize',
-    icon: '⭕',
-    description: 'Darken edges of frame',
-  },
-  {
-    type: 'glow',
-    name: 'Glow',
-    category: 'stylize',
-    icon: '✨',
-    description: 'Add soft glow to highlights',
-  },
-  {
-    type: 'film_grain',
-    name: 'Film Grain',
-    category: 'stylize',
-    icon: '🎞️',
-    description: 'Add vintage film grain',
-  },
-  
-  // Distortion Effects
-  {
-    type: 'transform',
-    name: 'Transform',
-    category: 'distortion',
-    icon: '🔄',
-    description: 'Scale, rotate, and position',
-  },
-  {
-    type: 'crop',
-    name: 'Crop',
-    category: 'distortion',
-    icon: '✂️',
-    description: 'Crop and reframe',
-  },
-];
 
 export function EffectsPanel() {
   const [searchQuery, setSearchQuery] = useState('');
@@ -117,7 +29,7 @@ export function EffectsPanel() {
     .find((c) => selectedClips.includes(c.id));
 
   // Filter effects
-  const filteredEffects = BASIC_EFFECTS.filter((effect) => {
+  const filteredEffects = ALL_EFFECTS.filter((effect) => {
     const matchesSearch = effect.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          effect.description.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory === 'all' || effect.category === selectedCategory;
@@ -131,6 +43,10 @@ export function EffectsPanel() {
     { id: 'blur', label: 'Blur' },
     { id: 'stylize', label: 'Stylize' },
     { id: 'distortion', label: 'Distortion' },
+    { id: 'time', label: 'Time' },
+    { id: 'keying', label: 'Keying' },
+    { id: 'noise', label: 'Noise' },
+    { id: 'generate', label: 'Generate' },
   ];
 
   /**

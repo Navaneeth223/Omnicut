@@ -32,6 +32,8 @@ export interface MediaItem {
   name: string;
   /** File path or URL */
   path: string;
+  /** URL (for backward compatibility) */
+  url?: string;
   /** Media type */
   type: MediaType;
   /** MIME type */

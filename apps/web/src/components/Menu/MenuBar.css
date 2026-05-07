@@ -1,0 +1,211 @@
+/**
+ * Menu Bar Styles
+ */
+
+.menu-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  background-color: var(--bg-tertiary);
+  border-bottom: 1px solid var(--border-normal);
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1000;
+}
+
+.menu-bar__left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.menu-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 1rem;
+  padding-right: 1rem;
+  border-right: 1px solid var(--border-subtle);
+}
+
+.logo__icon {
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.logo__text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.logo__version {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  opacity: 0.7;
+}
+
+/* Menu Items */
+.menu-item {
+  position: relative;
+}
+
+.menu-button {
+  padding: 0.5rem 0.75rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+}
+
+.menu-button:hover {
+  background-color: var(--bg-hover);
+}
+
+.menu-button--active {
+  background-color: var(--bg-active);
+  color: var(--primary);
+}
+
+/* Dropdown Menu */
+.menu-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0.25rem;
+  min-width: 220px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-normal);
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  padding: 0.5rem 0;
+  z-index: 1001;
+  animation: menuFadeIn 0.15s ease;
+}
+
+@keyframes menuFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.menu-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.menu-option:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+}
+
+.menu-option:disabled {
+  color: var(--text-disabled);
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.menu-option__label {
+  flex: 1;
+}
+
+.menu-option__shortcut {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-left: 2rem;
+}
+
+.menu-separator {
+  height: 1px;
+  background-color: var(--border-subtle);
+  margin: 0.5rem 0;
+}
+
+/* Right Side Items */
+.menu__item {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  padding: 0 0.5rem;
+}
+
+.icon-button {
+  padding: 0.5rem;
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-size: 1.2rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+}
+
+.icon-button:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+}
+
+.icon-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.button {
+  padding: 0.5rem 1rem;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-normal);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 6px;
+  transition: all 0.15s ease;
+}
+
+.button:hover:not(:disabled) {
+  background-color: var(--bg-hover);
+  border-color: var(--border-hover);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.button--primary {
+  background-color: var(--primary);
+  border-color: var(--primary);
+  color: white;
+}
+
+.button--primary:hover:not(:disabled) {
+  background-color: var(--primary-hover);
+  border-color: var(--primary-hover);
+}

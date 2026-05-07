@@ -7,9 +7,13 @@
 // Export FFmpeg manager
 export * from './ffmpeg-manager';
 
-// Export media importer
-export * from './media-importer';
+// Export browser-based media importer (for web)
 export * from './browser-importer';
+
+// Export renderers
+export * from './video-renderer';
+export * from './effect-renderer';
+export * from './transition-renderer';
 
 // Export utilities
 export * from './metadata-extractor';

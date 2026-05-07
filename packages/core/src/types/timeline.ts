@@ -109,6 +109,14 @@ export interface Clip {
   trackId: string;
   /** Reference to media pool item */
   mediaId: string;
+  /** Media item ID (for backward compatibility) */
+  mediaItemId?: string;
+  /** Media URL (for direct access) */
+  mediaUrl?: string;
+  /** Source URL (for backward compatibility) */
+  source?: string;
+  /** Clip type (for quick access) */
+  type?: 'video' | 'audio' | 'image';
   /** Clip name */
   name: string;
   /** Position on timeline in seconds */

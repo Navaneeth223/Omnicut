@@ -12,6 +12,7 @@ import { SettingsDialog } from './components/Settings/SettingsDialog';
 import { EffectsPanel } from './components/Effects/EffectsPanel';
 import { TransitionsPanel } from './components/Transitions/TransitionsPanel';
 import { VideoViewer } from './components/Viewer/VideoViewer';
+import { MenuBar } from './components/Menu/MenuBar';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -111,61 +112,17 @@ function App() {
   return (
     <div className="app">
       {/* Menu Bar */}
-      <header className="menu-bar">
-        <div className="menu-bar__left">
-          <div className="logo">
-            <span className="logo__icon">◆</span>
-            <span className="logo__text">OmniCut</span>
-            <span className="logo__version">{VERSION}</span>
-          </div>
-          <nav className="menu">
-            <button className="menu__item">File</button>
-            <button className="menu__item">Edit</button>
-            <button className="menu__item">View</button>
-            <button className="menu__item">Insert</button>
-            <button className="menu__item">Effects</button>
-            <button className="menu__item">Tools</button>
-            <button className="menu__item">Help</button>
-          </nav>
-        </div>
-        <div className="menu-bar__right">
-          <button
-            className="icon-button"
-            onClick={undo}
-            disabled={!canUndo()}
-            title={`Undo ${getUndoDescription() || ''} (⌘Z)`}
-          >
-            ↶
-          </button>
-          <button
-            className="icon-button"
-            onClick={redo}
-            disabled={!canRedo()}
-            title={`Redo ${getRedoDescription() || ''} (⌘⇧Z)`}
-          >
-            ↷
-          </button>
-          <button
-            className="button button--primary"
-            onClick={() => setShowExportDialog(true)}
-            disabled={!timeline || timeline.tracks.every((t) => t.clips.length === 0)}
-            title="Export video (Cmd+E)"
-          >
-            Export
-          </button>
-          <span className="menu__item">
-            {project?.name || 'No Project'}
-            {isDirty && ' •'}
-          </span>
-          <button
-            className="icon-button"
-            onClick={() => setShowSettingsDialog(true)}
-            title="Settings"
-          >
-            ⚙️
-          </button>
-        </div>
-      </header>
+      <MenuBar
+        onExport={() => setShowExportDialog(true)}
+        onSettings={() => setShowSettingsDialog(true)}
+        onImportMedia={() => {
+          // Trigger import in MediaPool
+          const importButton = document.querySelector('.media-pool__actions button');
+          if (importButton) {
+            (importButton as HTMLButtonElement).click();
+          }
+        }}
+      />
 
       {/* Workspace Tabs */}
       <div className="workspace-tabs">
