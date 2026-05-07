@@ -5,12 +5,24 @@
 
 import type { EffectType, EffectCategory } from '@omnicut/core';
 
+export interface EffectParameter {
+  name: string;
+  label: string;
+  type: 'slider' | 'color' | 'checkbox' | 'select';
+  min?: number;
+  max?: number;
+  default: number | string | boolean;
+  step?: number;
+}
+
 export interface EffectDefinition {
   type: EffectType;
   name: string;
   category: EffectCategory;
   icon: string;
   description: string;
+  parameters?: EffectParameter[];
+  implemented?: boolean; // Whether the effect has working shader
 }
 
 /**
@@ -24,6 +36,27 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'color',
     icon: '☀️',
     description: 'Adjust brightness and contrast',
+    implemented: true,
+    parameters: [
+      {
+        name: 'brightness',
+        label: 'Brightness',
+        type: 'slider',
+        min: -1,
+        max: 1,
+        default: 0,
+        step: 0.01,
+      },
+      {
+        name: 'contrast',
+        label: 'Contrast',
+        type: 'slider',
+        min: 0,
+        max: 3,
+        default: 1,
+        step: 0.01,
+      },
+    ],
   },
   {
     type: 'hue_saturation',
@@ -31,6 +64,27 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'color',
     icon: '🎨',
     description: 'Adjust hue, saturation, and lightness',
+    implemented: true,
+    parameters: [
+      {
+        name: 'hue',
+        label: 'Hue',
+        type: 'slider',
+        min: -0.5,
+        max: 0.5,
+        default: 0,
+        step: 0.01,
+      },
+      {
+        name: 'saturation',
+        label: 'Saturation',
+        type: 'slider',
+        min: 0,
+        max: 2,
+        default: 1,
+        step: 0.01,
+      },
+    ],
   },
   {
     type: 'exposure',
@@ -82,6 +136,18 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'blur',
     icon: '🌫️',
     description: 'Smooth blur effect',
+    implemented: true,
+    parameters: [
+      {
+        name: 'radius',
+        label: 'Radius',
+        type: 'slider',
+        min: 0,
+        max: 10,
+        default: 2,
+        step: 0.1,
+      },
+    ],
   },
   {
     type: 'motion_blur',
@@ -103,6 +169,18 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'blur',
     icon: '🔪',
     description: 'Enhance edge definition',
+    implemented: true,
+    parameters: [
+      {
+        name: 'amount',
+        label: 'Amount',
+        type: 'slider',
+        min: 0,
+        max: 2,
+        default: 0.5,
+        step: 0.01,
+      },
+    ],
   },
   {
     type: 'unsharp_mask',
@@ -119,6 +197,27 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'stylize',
     icon: '⭕',
     description: 'Darken edges of frame',
+    implemented: true,
+    parameters: [
+      {
+        name: 'amount',
+        label: 'Amount',
+        type: 'slider',
+        min: 0,
+        max: 1,
+        default: 0.5,
+        step: 0.01,
+      },
+      {
+        name: 'radius',
+        label: 'Radius',
+        type: 'slider',
+        min: 0.5,
+        max: 1.5,
+        default: 0.8,
+        step: 0.01,
+      },
+    ],
   },
   {
     type: 'glow',
@@ -126,6 +225,27 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'stylize',
     icon: '✨',
     description: 'Add soft glow to highlights',
+    implemented: true,
+    parameters: [
+      {
+        name: 'intensity',
+        label: 'Intensity',
+        type: 'slider',
+        min: 0,
+        max: 2,
+        default: 0.5,
+        step: 0.01,
+      },
+      {
+        name: 'threshold',
+        label: 'Threshold',
+        type: 'slider',
+        min: 0,
+        max: 1,
+        default: 0.7,
+        step: 0.01,
+      },
+    ],
   },
   {
     type: 'film_grain',
@@ -133,6 +253,27 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'stylize',
     icon: '🎞️',
     description: 'Add vintage film grain',
+    implemented: true,
+    parameters: [
+      {
+        name: 'amount',
+        label: 'Amount',
+        type: 'slider',
+        min: 0,
+        max: 0.5,
+        default: 0.1,
+        step: 0.01,
+      },
+      {
+        name: 'time',
+        label: 'Seed',
+        type: 'slider',
+        min: 0,
+        max: 100,
+        default: 0,
+        step: 0.1,
+      },
+    ],
   },
   {
     type: 'chromatic_aberration',
@@ -140,6 +281,18 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'stylize',
     icon: '🌈',
     description: 'RGB color separation',
+    implemented: true,
+    parameters: [
+      {
+        name: 'amount',
+        label: 'Amount',
+        type: 'slider',
+        min: 0,
+        max: 10,
+        default: 2,
+        step: 0.1,
+      },
+    ],
   },
   {
     type: 'lens_flare',
@@ -198,6 +351,44 @@ export const ALL_EFFECTS: EffectDefinition[] = [
     category: 'distortion',
     icon: '🌀',
     description: 'Spiral twirl effect',
+  },
+  {
+    type: 'pixelate',
+    name: 'Pixelate',
+    category: 'distortion',
+    icon: '🔲',
+    description: 'Mosaic/pixel effect',
+    implemented: true,
+    parameters: [
+      {
+        name: 'pixelSize',
+        label: 'Pixel Size',
+        type: 'slider',
+        min: 1,
+        max: 50,
+        default: 10,
+        step: 1,
+      },
+    ],
+  },
+  {
+    type: 'grayscale',
+    name: 'Grayscale',
+    category: 'distortion',
+    icon: '⚫',
+    description: 'Remove color',
+    implemented: true,
+    parameters: [
+      {
+        name: 'amount',
+        label: 'Amount',
+        type: 'slider',
+        min: 0,
+        max: 1,
+        default: 1,
+        step: 0.01,
+      },
+    ],
   },
 
   // ===== TIME EFFECTS =====
@@ -313,4 +504,18 @@ export function searchEffects(query: string): EffectDefinition[] {
       effect.name.toLowerCase().includes(lowerQuery) ||
       effect.description.toLowerCase().includes(lowerQuery)
   );
+}
+
+/**
+ * Get implemented effects only
+ */
+export function getImplementedEffects(): EffectDefinition[] {
+  return ALL_EFFECTS.filter((effect) => effect.implemented);
+}
+
+/**
+ * Get effect by type
+ */
+export function getEffectByType(type: EffectType): EffectDefinition | undefined {
+  return ALL_EFFECTS.find((effect) => effect.type === type);
 }

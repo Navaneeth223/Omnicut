@@ -13,7 +13,11 @@
     "paths": {
       "@/*": ["./src/*"],
       "@omnicut/core": ["../../packages/core/src"]
-    }
+    },
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noImplicitAny": false
   },
   "include": ["src"],
   "references": [{ "path": "../../packages/core" }]

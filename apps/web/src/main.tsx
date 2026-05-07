@@ -7,6 +7,7 @@ import ReactDOM from 'react-dom/client';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from './ErrorBoundary';
 import App from './App';
+import './styles/design-tokens.css';
 import './styles/index.css';
 
 // Create React Query client

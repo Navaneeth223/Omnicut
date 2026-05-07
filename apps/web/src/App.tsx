@@ -5,6 +5,7 @@
 import { useEffect, useState } from 'react';
 import { useProjectStore, useTimelineStore, useMediaPoolStore, useHistoryStore } from '@omnicut/store';
 import { VERSION, createDefaultProject, generateId } from '@omnicut/core';
+import { Header } from './components/Header/Header';
 import { MediaPool } from './components/MediaPool/MediaPool';
 import { Timeline } from './components/Timeline/Timeline';
 import { ExportDialog } from './components/Export/ExportDialog';
@@ -12,19 +13,21 @@ import { SettingsDialog } from './components/Settings/SettingsDialog';
 import { EffectsPanel } from './components/Effects/EffectsPanel';
 import { TransitionsPanel } from './components/Transitions/TransitionsPanel';
 import { VideoViewer } from './components/Viewer/VideoViewer';
-import { MenuBar } from './components/Menu/MenuBar';
+import { ShortsStudio } from './components/ShortsStudio/ShortsStudio';
+import { AIVoice } from './components/AIVoice/AIVoice';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
 import './styles/App.css';
 
 function App() {
-  const [workspace, setWorkspace] = useState<'edit' | 'color' | 'audio' | 'photo'>('edit');
+  const [workspace, setWorkspace] = useState<'edit' | 'shorts' | 'ai-voice' | 'ai-video' | 'color' | 'audio' | 'photo'>('shorts');
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
   const [showAutoSaveIndicator, setShowAutoSaveIndicator] = useState(false);
   const [autoSaveInterval, setAutoSaveInterval] = useState(30000);
   const [rightPanelTab, setRightPanelTab] = useState<'effects' | 'transitions'>('effects');
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Project state
   const project = useProjectStore((state) => state.project);
@@ -97,6 +100,11 @@ function App() {
       
       // Initialize media pool
       initMediaPool(newProject.mediaPool);
+      
+      // Mark as initialized
+      setIsInitialized(true);
+    } else {
+      setIsInitialized(true);
     }
   }, [project, createProject, initTimeline, addTrack, initMediaPool]);
 
@@ -109,52 +117,76 @@ function App() {
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}:${f.toString().padStart(2, '0')}`;
   };
 
+  // Show loading screen while initializing
+  if (!isInitialized) {
+    return (
+      <div className="app">
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          height: '100vh',
+          background: '#1a1a1a',
+          color: 'white',
+          flexDirection: 'column',
+          gap: '20px'
+        }}>
+          <h1 style={{ fontSize: '3rem', margin: 0 }}>🎬 OmniCut</h1>
+          <p style={{ fontSize: '1.2rem', opacity: 0.7 }}>Loading AI Shorts Studio...</p>
+          <div style={{
+            width: '200px',
+            height: '4px',
+            background: '#333',
+            borderRadius: '2px',
+            overflow: 'hidden'
+          }}>
+            <div style={{
+              width: '100%',
+              height: '100%',
+              background: 'linear-gradient(90deg, #3b82f6, #9333ea)',
+              animation: 'loading 1.5s ease-in-out infinite'
+            }} />
+          </div>
+          <style>{`
+            @keyframes loading {
+              0% { transform: translateX(-100%); }
+              100% { transform: translateX(100%); }
+            }
+          `}</style>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
-      {/* Menu Bar */}
-      <MenuBar
+      {/* New Premium Header */}
+      <Header
+        workspace={workspace}
+        onWorkspaceChange={(ws) => setWorkspace(ws as any)}
         onExport={() => setShowExportDialog(true)}
         onSettings={() => setShowSettingsDialog(true)}
-        onImportMedia={() => {
-          // Trigger import in MediaPool
-          const importButton = document.querySelector('.media-pool__actions button');
-          if (importButton) {
-            (importButton as HTMLButtonElement).click();
-          }
-        }}
       />
-
-      {/* Workspace Tabs */}
-      <div className="workspace-tabs">
-        <button
-          className={`workspace-tab ${workspace === 'edit' ? 'workspace-tab--active' : ''}`}
-          onClick={() => setWorkspace('edit')}
-        >
-          Edit
-        </button>
-        <button
-          className={`workspace-tab ${workspace === 'color' ? 'workspace-tab--active' : ''}`}
-          onClick={() => setWorkspace('color')}
-        >
-          Color
-        </button>
-        <button
-          className={`workspace-tab ${workspace === 'audio' ? 'workspace-tab--active' : ''}`}
-          onClick={() => setWorkspace('audio')}
-        >
-          Audio
-        </button>
-        <button
-          className={`workspace-tab ${workspace === 'photo' ? 'workspace-tab--active' : ''}`}
-          onClick={() => setWorkspace('photo')}
-        >
-          Photo
-        </button>
-      </div>
 
       {/* Main Content */}
       <main className="main-content">
-        <div className="layout">
+        {workspace === 'shorts' ? (
+          <ShortsStudio />
+        ) : workspace === 'ai-voice' ? (
+          <AIVoice />
+        ) : workspace === 'ai-video' ? (
+          <div className="coming-soon">
+            <div className="coming-soon__icon">🤖</div>
+            <h2 className="coming-soon__title">AI Video Generation</h2>
+            <p className="coming-soon__text">
+              Generate videos from text prompts using AI. Coming soon!
+            </p>
+            <p className="coming-soon__hint">
+              This will integrate with services like Runway ML, Pika Labs, or Stable Video Diffusion
+            </p>
+          </div>
+        ) : (
+          <div className="layout">
           {/* Left Panel - Media Pool */}
           <aside className="panel panel--left">
             <MediaPool />
@@ -316,6 +348,7 @@ function App() {
             </div>
           </aside>
         </div>
+        )}
       </main>
 
       {/* Status Bar */}

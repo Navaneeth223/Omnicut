@@ -1,0 +1,485 @@
+/**
+ * OmniCut Design System
+ * Complete visual overhaul - Premium creative application aesthetic
+ */
+
+:root {
+  /* ── Backgrounds ─────────────────────────────── */
+  --bg-app:          #0d0d10;      /* deepest background */
+  --bg-panel:        #13131a;      /* panel/sidebar */
+  --bg-surface:      #1a1a24;      /* cards, wells */
+  --bg-elevated:     #21212e;      /* dropdowns, popups */
+  --bg-hover:        rgba(255,255,255,0.05);
+  --bg-active:       rgba(99,102,241,0.15);
+  --bg-selection:    rgba(99,102,241,0.25);
+
+  /* ── Borders ─────────────────────────────────── */
+  --border-faint:    rgba(255,255,255,0.04);
+  --border-subtle:   rgba(255,255,255,0.07);
+  --border-normal:   rgba(255,255,255,0.11);
+  --border-strong:   rgba(255,255,255,0.18);
+
+  /* ── Brand Accent (Indigo → Electric Blue gradient) */
+  --accent-1:        #6366f1;      /* primary indigo */
+  --accent-2:        #818cf8;      /* lighter indigo */
+  --accent-glow:     rgba(99,102,241,0.35);
+  --accent-gradient: linear-gradient(135deg, #6366f1 0%, #06b6d4 100%);
+
+  /* ── Semantic Colors ─────────────────────────── */
+  --color-success:   #10b981;
+  --color-warning:   #f59e0b;
+  --color-error:     #ef4444;
+  --color-info:      #06b6d4;
+  --color-record:    #ef4444;
+  --color-ai:        #a855f7;      /* purple = AI features */
+
+  /* ── Text ────────────────────────────────────── */
+  --text-primary:    #f1f1f8;
+  --text-secondary:  #8b8ba8;
+  --text-tertiary:   #4e4e68;
+  --text-disabled:   #2e2e48;
+
+  /* ── Track Colors ────────────────────────────── */
+  --track-video:     #3b82f6;
+  --track-audio:     #10b981;
+  --track-title:     #a855f7;
+  --track-effect:    #f97316;
+  --track-music:     #ec4899;
+
+  /* ── Radii ───────────────────────────────────── */
+  --radius-sm:       6px;
+  --radius-md:       10px;
+  --radius-lg:       14px;
+  --radius-xl:       20px;
+  --radius-2xl:      28px;
+  --radius-full:     9999px;
+
+  /* ── Shadows ─────────────────────────────────── */
+  --shadow-sm:       0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:       0 4px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+  --shadow-lg:       0 12px 40px rgba(0,0,0,0.6), 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-glow:     0 0 24px var(--accent-glow);
+  --shadow-panel:    inset 0 1px 0 rgba(255,255,255,0.05);
+
+  /* ── Spacing (8px base) ──────────────────────── */
+  --sp-1: 4px;  --sp-2: 8px;  --sp-3: 12px; --sp-4: 16px;
+  --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px;
+
+  /* ── Typography ──────────────────────────────── */
+  --font-ui:         'Outfit', 'SF Pro Display', system-ui, -apple-system, sans-serif;
+  --font-mono:       'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  --font-display:    'Syne', 'SF Pro Display', sans-serif;
+
+  /* ── Transitions ─────────────────────────────── */
+  --ease-spring:     cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-out:        cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out:     cubic-bezier(0.65, 0, 0.35, 1);
+  --duration-fast:   120ms;
+  --duration-normal: 220ms;
+  --duration-slow:   380ms;
+
+  /* ── Blur / Glass ────────────────────────────── */
+  --blur-sm:         blur(8px);
+  --blur-md:         blur(16px);
+  --blur-lg:         blur(32px);
+}
+
+/* ── Reset & Base ─────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: var(--font-ui);
+  font-size: 12px;
+  background: var(--bg-app);
+  color: var(--text-primary);
+  overflow: hidden;
+  user-select: none;
+}
+
+/* ── Custom Scrollbar ─────────────────────────── */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-normal);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--border-strong);
+}
+
+/* ── Glass Panel Mixin ────────────────────────── */
+.glass {
+  background: rgba(19, 19, 26, 0.85);
+  backdrop-filter: var(--blur-md);
+  -webkit-backdrop-filter: var(--blur-md);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── Glow Button ──────────────────────────────── */
+.btn-glow {
+  background: var(--accent-gradient);
+  box-shadow: var(--shadow-glow), var(--shadow-md);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: transform var(--duration-fast) var(--ease-spring),
+              box-shadow var(--duration-normal) var(--ease-out),
+              filter var(--duration-normal) var(--ease-out);
+}
+
+.btn-glow:hover {
+  transform: translateY(-1px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 0 40px var(--accent-glow), var(--shadow-lg);
+}
+
+.btn-glow:active {
+  transform: scale(0.98);
+}
+
+/* ── Panel ────────────────────────────────────── */
+.panel {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-faint);
+  box-shadow: var(--shadow-panel);
+}
+
+/* ── Pill Badge ───────────────────────────────── */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+/* ── Animated gradient text ───────────────────── */
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Input ────────────────────────────────────── */
+.input {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  padding: 7px 10px;
+  font-size: 12px;
+  font-family: var(--font-ui);
+  outline: none;
+  transition: border-color var(--duration-fast),
+              box-shadow var(--duration-fast);
+}
+
+.input:focus {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ── Tooltip ─────────────────────────────────────*/
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-normal);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+  font-size: 11px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 9999;
+  box-shadow: var(--shadow-md);
+  animation: tooltipIn 150ms var(--ease-out) forwards;
+}
+
+@keyframes tooltipIn {
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+/* ── Reduced Motion ──────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── Button Base Styles ──────────────────────── */
+.button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-spring);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 1px solid var(--border-subtle);
+}
+
+.button:hover {
+  transform: translateY(-1px);
+  background: var(--bg-elevated);
+  border-color: var(--border-normal);
+}
+
+.button:active {
+  transform: scale(0.98);
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.button--primary {
+  background: var(--accent-gradient);
+  border: none;
+  box-shadow: var(--shadow-glow);
+}
+
+.button--primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 0 40px var(--accent-glow), var(--shadow-md);
+}
+
+.button--secondary {
+  background: var(--bg-surface);
+  border: 2px solid var(--accent-1);
+  color: var(--accent-1);
+}
+
+.button--secondary:hover {
+  background: var(--accent-1);
+  color: white;
+}
+
+.button--ghost {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+}
+
+.button--ghost:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+/* ── Icon Button ──────────────────────────────── */
+.icon-button {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-md);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-spring);
+}
+
+.icon-button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  transform: scale(1.08);
+}
+
+.icon-button:active {
+  transform: scale(0.95);
+}
+
+.icon-button--active {
+  background: var(--accent-gradient);
+  color: white;
+  box-shadow: var(--shadow-glow);
+}
+
+/* ── Card ──────────────────────────────────────── */
+.card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: var(--border-normal);
+  box-shadow: var(--shadow-md);
+}
+
+.card--interactive {
+  cursor: pointer;
+}
+
+.card--interactive:hover {
+  border-color: var(--accent-1);
+  box-shadow: 0 0 24px var(--accent-glow), var(--shadow-md);
+}
+
+.card--selected {
+  border-color: var(--accent-1);
+  background: var(--bg-active);
+  box-shadow: 0 0 24px var(--accent-glow);
+}
+
+/* ── Loading Spinner ──────────────────────────── */
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--border-subtle);
+  border-top-color: var(--accent-1);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ── Progress Bar ──────────────────────────────── */
+.progress {
+  width: 100%;
+  height: 4px;
+  background: var(--bg-surface);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.progress__bar {
+  height: 100%;
+  background: var(--accent-gradient);
+  transition: width var(--duration-normal) var(--ease-out);
+  position: relative;
+}
+
+.progress__bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255,255,255,0.3),
+    transparent
+  );
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* ── Divider ──────────────────────────────────── */
+.divider {
+  height: 1px;
+  background: var(--border-faint);
+  margin: var(--sp-4) 0;
+}
+
+.divider--vertical {
+  width: 1px;
+  height: auto;
+  margin: 0 var(--sp-2);
+}
+
+/* ── Fade Animations ──────────────────────────── */
+.fade-in {
+  animation: fadeIn var(--duration-normal) var(--ease-out);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.slide-in-right {
+  animation: slideInRight var(--duration-normal) var(--ease-out);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.scale-in {
+  animation: scaleIn var(--duration-normal) var(--ease-spring);
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

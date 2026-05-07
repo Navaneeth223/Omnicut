@@ -1,31 +1,24 @@
 /**
- * Timeline Styles
+ * Timeline Styles - Premium Design
  */
 
 .timeline-wrapper {
   display: flex;
   flex-direction: column;
   height: 100%;
-  background-color: var(--bg-secondary);
+  background: var(--bg-panel);
   overflow: hidden;
 }
 
-.timeline-header {
-  display: flex;
-  align-items: center;
-  height: 40px;
-  background-color: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-normal);
-  flex-shrink: 0;
-}
-
+/* Ruler */
 .timeline-ruler {
   position: relative;
-  height: 30px;
-  background-color: var(--bg-tertiary);
-  border-bottom: 1px solid var(--border-normal);
+  height: 32px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-faint);
   overflow: hidden;
   flex-shrink: 0;
+  box-shadow: var(--shadow-panel);
 }
 
 .timeline-ruler__ticks {
@@ -40,50 +33,57 @@
   position: absolute;
   height: 100%;
   border-left: 1px solid var(--border-subtle);
-  font-size: var(--font-size-xs);
-  color: var(--text-secondary);
+  font-size: 10px;
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
   padding-left: 4px;
+  padding-top: 2px;
   white-space: nowrap;
+  transition: color var(--duration-fast);
 }
 
 .timeline-ruler__tick--major {
   border-left-color: var(--border-normal);
-  font-weight: 500;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
+/* Content */
 .timeline-content {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
+/* Track Headers */
 .timeline-tracks-header {
   width: 200px;
-  background-color: var(--bg-tertiary);
-  border-right: 1px solid var(--border-normal);
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-faint);
   overflow-y: auto;
   flex-shrink: 0;
-}
-
-.timeline-tracks-content {
-  flex: 1;
-  overflow: auto;
-  position: relative;
 }
 
 .timeline-track-header {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2);
-  border-bottom: 1px solid var(--border-subtle);
-  background-color: var(--bg-tertiary);
+  gap: var(--sp-2);
+  padding: var(--sp-2) var(--sp-3);
+  border-bottom: 1px solid var(--border-faint);
+  background: var(--bg-panel);
+  min-height: 60px;
+  transition: background var(--duration-fast);
+}
+
+.timeline-track-header:hover {
+  background: var(--bg-hover);
 }
 
 .timeline-track-header__name {
   flex: 1;
-  font-size: var(--font-size-sm);
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -91,14 +91,37 @@
 
 .timeline-track-header__controls {
   display: flex;
-  gap: var(--space-1);
+  gap: 2px;
+}
+
+.timeline-track-header__controls .icon-button {
+  width: 24px;
+  height: 24px;
+  font-size: 11px;
+}
+
+/* Track Content */
+.timeline-tracks-content {
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  background: var(--bg-surface);
 }
 
 .timeline-track {
   position: relative;
-  border-bottom: 1px solid var(--border-subtle);
-  background-color: var(--bg-primary);
+  border-bottom: 1px solid var(--border-faint);
+  background: var(--bg-surface);
   min-height: 60px;
+  transition: background var(--duration-fast);
+}
+
+.timeline-track:nth-child(even) {
+  background: rgba(255, 255, 255, 0.01);
+}
+
+.timeline-track:hover {
+  background: var(--bg-hover);
 }
 
 .timeline-track--video {
@@ -109,56 +132,72 @@
   height: 60px;
 }
 
+.timeline-track--drag-over {
+  background: var(--bg-active);
+  border: 2px dashed var(--accent-1);
+  box-sizing: border-box;
+}
+
+/* Clips */
 .timeline-clip {
   position: absolute;
-  top: 4px;
-  bottom: 4px;
-  background-color: var(--timeline-video);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 2px;
+  top: 6px;
+  bottom: 6px;
+  background: var(--track-video);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-sm);
   cursor: move;
   overflow: hidden;
-  transition: opacity var(--transition-fast);
+  transition: all var(--duration-fast) var(--ease-out);
+  box-shadow: var(--shadow-sm);
 }
 
 .timeline-clip--audio {
-  background-color: var(--timeline-audio);
+  background: var(--track-audio);
+}
+
+.timeline-clip:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+  border-color: rgba(255, 255, 255, 0.25);
 }
 
 .timeline-clip--selected {
-  border-color: var(--accent-blue);
-  box-shadow: 0 0 0 2px var(--accent-blue);
+  border-color: var(--accent-1);
+  box-shadow: 0 0 0 2px var(--accent-1), var(--shadow-md);
   z-index: 10;
 }
 
 .timeline-clip--dragging {
   opacity: 0.7;
   cursor: grabbing !important;
+  transform: rotate(2deg) scale(1.02);
+  box-shadow: var(--shadow-lg);
 }
 
 .timeline-clip--overlap {
-  border-color: var(--accent-red) !important;
-  box-shadow: 0 0 0 2px var(--accent-red) !important;
-}
-
-.timeline-clip:hover {
-  opacity: 0.9;
+  border-color: var(--color-error) !important;
+  box-shadow: 0 0 0 2px var(--color-error) !important;
 }
 
 .timeline-clip__content {
-  padding: var(--space-2);
+  padding: var(--sp-2);
   height: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  position: relative;
+  z-index: 2;
 }
 
 .timeline-clip__name {
-  font-size: var(--font-size-xs);
-  font-weight: 500;
+  font-size: 11px;
+  font-weight: 600;
+  color: white;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 .timeline-clip__waveform {
@@ -167,7 +206,8 @@
   left: 0;
   right: 0;
   height: 30px;
-  opacity: 0.5;
+  opacity: 0.4;
+  z-index: 1;
 }
 
 .timeline-clip__thumbnail {
@@ -178,6 +218,7 @@
   height: 100%;
   object-fit: cover;
   opacity: 0.3;
+  z-index: 0;
 }
 
 .timeline-clip__resize-handle {
@@ -186,7 +227,8 @@
   bottom: 0;
   width: 8px;
   cursor: ew-resize;
-  z-index: 2;
+  z-index: 3;
+  transition: background var(--duration-fast);
 }
 
 .timeline-clip__resize-handle--left {
@@ -198,52 +240,64 @@
 }
 
 .timeline-clip__resize-handle:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.3);
 }
 
+/* Playhead */
 .timeline-playhead {
   position: absolute;
   top: 0;
   bottom: 0;
   width: 2px;
-  background-color: var(--accent-red);
+  background: var(--color-record);
   pointer-events: none;
   z-index: 100;
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
 }
 
 .timeline-playhead::before {
   content: '';
   position: absolute;
-  top: -8px;
-  left: -6px;
+  top: -10px;
+  left: -7px;
   width: 0;
   height: 0;
-  border-left: 6px solid transparent;
-  border-right: 6px solid transparent;
-  border-top: 8px solid var(--accent-red);
+  border-left: 7px solid transparent;
+  border-right: 7px solid transparent;
+  border-top: 10px solid var(--color-record);
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
 }
 
 .timeline-playhead__time {
   position: absolute;
-  top: -30px;
+  top: -32px;
   left: 50%;
   transform: translateX(-50%);
-  background-color: var(--accent-red);
+  background: var(--color-record);
   color: white;
-  padding: 2px 6px;
-  border-radius: 2px;
-  font-size: var(--font-size-xs);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 10px;
   font-family: var(--font-mono);
+  font-weight: 600;
   white-space: nowrap;
+  box-shadow: var(--shadow-md);
+  pointer-events: none;
 }
 
+/* Markers */
 .timeline-marker {
   position: absolute;
   top: 0;
   width: 2px;
   height: 20px;
-  background-color: var(--accent-yellow);
+  background: var(--color-warning);
   cursor: pointer;
+  transition: transform var(--duration-fast);
+}
+
+.timeline-marker:hover {
+  transform: scaleY(1.2);
 }
 
 .timeline-marker::before {
@@ -255,9 +309,10 @@
   height: 0;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
-  border-top: 6px solid var(--accent-yellow);
+  border-top: 6px solid var(--color-warning);
 }
 
+/* Empty State */
 .timeline-empty {
   display: flex;
   align-items: center;
@@ -266,18 +321,13 @@
   color: var(--text-secondary);
 }
 
-
-/* Drag and Drop Styles */
-.timeline-track--drag-over {
-  background-color: rgba(59, 130, 246, 0.1);
-  border: 2px dashed rgba(59, 130, 246, 0.5);
-  box-sizing: border-box;
-}
-
+/* Drag Feedback */
 .media-grid__item[draggable="true"] {
   cursor: grab;
+  transition: transform var(--duration-fast) var(--ease-spring);
 }
 
 .media-grid__item[draggable="true"]:active {
   cursor: grabbing;
+  transform: scale(1.05) rotate(2deg);
 }

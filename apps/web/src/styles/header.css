@@ -1,0 +1,271 @@
+/**
+ * Header / Menu Bar - Premium Design
+ */
+
+.app-header {
+  height: 48px;
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-faint);
+  box-shadow: 0 1px 0 var(--border-faint), 0 4px 24px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--sp-4);
+  gap: var(--sp-6);
+  position: relative;
+  z-index: 100;
+}
+
+/* ── Logo Section ──────────────────────────────── */
+.app-header__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.app-logo {
+  width: 28px;
+  height: 28px;
+  background: var(--accent-gradient);
+  border-radius: 6px;
+  transform: rotate(45deg);
+  transition: transform 400ms var(--ease-spring);
+  cursor: pointer;
+  position: relative;
+}
+
+.app-logo::before {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  background: var(--bg-panel);
+  border-radius: 2px;
+}
+
+.app-logo:hover {
+  transform: rotate(225deg);
+}
+
+.app-title {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
+}
+
+.app-version {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  background: var(--bg-surface);
+  color: var(--text-tertiary);
+  border: 1px solid var(--border-subtle);
+}
+
+/* ── Workspace Tabs ────────────────────────────── */
+.workspace-tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex: 1;
+  justify-content: center;
+}
+
+.workspace-tab {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+  position: relative;
+}
+
+.workspace-tab__icon {
+  font-size: 14px;
+  transition: transform var(--duration-fast) var(--ease-spring);
+}
+
+.workspace-tab:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.workspace-tab:hover .workspace-tab__icon {
+  transform: scale(1.1);
+}
+
+.workspace-tab--active {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.workspace-tab--active::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--accent-gradient);
+  border-radius: 2px 2px 0 0;
+  animation: slideIn 200ms var(--ease-out);
+}
+
+.workspace-tab--active .workspace-tab__icon {
+  filter: drop-shadow(0 0 8px var(--accent-glow));
+}
+
+@keyframes slideIn {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* ── Header Actions ────────────────────────────── */
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.header-button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-spring);
+  font-size: 16px;
+}
+
+.header-button:hover {
+  background: var(--bg-hover);
+  color: var(--text-primary);
+  transform: scale(1.08);
+}
+
+.header-button:active {
+  transform: scale(0.95);
+}
+
+.header-button--undo:hover {
+  transform: scale(1.08) rotate(-15deg);
+}
+
+.header-button--redo:hover {
+  transform: scale(1.08) rotate(15deg);
+}
+
+.header-button--settings:hover {
+  transform: scale(1.08) rotate(30deg);
+}
+
+.header-button--settings:active {
+  transform: scale(0.95) rotate(90deg);
+}
+
+.header-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* ── Export Button (Special) ───────────────────── */
+.export-button {
+  padding: 8px 16px;
+  background: var(--accent-gradient);
+  border: none;
+  border-radius: var(--radius-md);
+  color: white;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: var(--font-ui);
+  cursor: pointer;
+  box-shadow: var(--shadow-glow), var(--shadow-sm);
+  transition: all var(--duration-fast) var(--ease-spring);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.export-button:hover {
+  transform: translateY(-2px) scale(1.02);
+  filter: brightness(1.1);
+  box-shadow: 0 0 40px var(--accent-glow), var(--shadow-md);
+  animation: none;
+}
+
+.export-button:active {
+  transform: scale(0.98);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: var(--shadow-glow), var(--shadow-sm);
+  }
+  50% {
+    box-shadow: 0 0 32px var(--accent-glow), var(--shadow-md);
+  }
+}
+
+/* ── Project Name ──────────────────────────────── */
+.project-name {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-family: var(--font-ui);
+  cursor: text;
+  transition: all var(--duration-fast);
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-name:hover {
+  border-color: var(--border-subtle);
+  background: var(--bg-hover);
+  color: var(--text-primary);
+}
+
+.project-name:focus {
+  outline: none;
+  border-color: var(--accent-1);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+/* ── Divider ───────────────────────────────────── */
+.header-divider {
+  width: 1px;
+  height: 24px;
+  background: var(--border-faint);
+}
