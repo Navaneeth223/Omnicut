@@ -229,7 +229,7 @@ export function createDefaultBin(name: string, parentId?: string): Omit<MediaBin
  * Check if media item matches filter
  */
 export function matchesFilter(item: MediaItem, filter: MediaFilter): boolean {
-  const value = getNestedProperty(item, filter.property);
+  const value = getNestedProperty(item as unknown as Record<string, unknown>, filter.property);
 
   switch (filter.operator) {
     case 'equals':
@@ -260,34 +260,4 @@ function getNestedProperty(obj: Record<string, unknown>, path: string): unknown 
   return path.split('.').reduce((current, key) => {
     return current && typeof current === 'object' ? (current as Record<string, unknown>)[key] : undefined;
   }, obj as unknown);
-}
-
-/**
- * Format file size to human-readable string
- */
-export function formatFileSize(bytes: number): string {
-  const units = ['B', 'KB', 'MB', 'GB', 'TB'];
-  let size = bytes;
-  let unitIndex = 0;
-
-  while (size >= 1024 && unitIndex < units.length - 1) {
-    size /= 1024;
-    unitIndex++;
-  }
-
-  return `${size.toFixed(2)} ${units[unitIndex]}`;
-}
-
-/**
- * Format duration to human-readable string
- */
-export function formatDuration(seconds: number): string {
-  const hours = Math.floor(seconds / 3600);
-  const minutes = Math.floor((seconds % 3600) / 60);
-  const secs = Math.floor(seconds % 60);
-
-  if (hours > 0) {
-    return `${hours}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  }
-  return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }

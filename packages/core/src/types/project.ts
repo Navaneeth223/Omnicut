@@ -211,6 +211,7 @@ export function createDefaultProject(name: string): Omit<OmniCutProject, 'id' | 
         muted: false,
         solo: false,
         effects: [],
+        output: 'master',
       },
     },
     exportPresets: [],

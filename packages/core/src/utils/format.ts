@@ -37,23 +37,7 @@ export function formatDuration(seconds: number): string {
   return `${minutes}:${secs.toString().padStart(2, '0')}`;
 }
 
-/**
- * Format timecode (HH:MM:SS:FF)
- * @param seconds - Time in seconds
- * @param frameRate - Frame rate
- * @returns Timecode string
- */
-export function formatTimecode(seconds: number, frameRate: number): string {
-  const totalFrames = Math.floor(seconds * frameRate);
-  const frames = totalFrames % frameRate;
-  const totalSeconds = Math.floor(totalFrames / frameRate);
-  const secs = totalSeconds % 60;
-  const totalMinutes = Math.floor(totalSeconds / 60);
-  const mins = totalMinutes % 60;
-  const hours = Math.floor(totalMinutes / 60);
 
-  return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}:${frames.toString().padStart(2, '0')}`;
-}
 
 /**
  * Format number with commas

@@ -3,6 +3,8 @@
  * @module types/effects
  */
 
+import type { EasingFunction } from './keyframes';
+
 /**
  * Effect applied to a clip or track
  */
@@ -242,35 +244,6 @@ export interface Transition {
   parameters: EffectParameter[];
 }
 
-/**
- * Easing functions for animations
- */
-export type EasingFunction =
-  | 'linear'
-  | 'ease-in'
-  | 'ease-out'
-  | 'ease-in-out'
-  | 'ease-in-quad'
-  | 'ease-out-quad'
-  | 'ease-in-out-quad'
-  | 'ease-in-cubic'
-  | 'ease-out-cubic'
-  | 'ease-in-out-cubic'
-  | 'ease-in-quart'
-  | 'ease-out-quart'
-  | 'ease-in-out-quart'
-  | 'ease-in-expo'
-  | 'ease-out-expo'
-  | 'ease-in-out-expo'
-  | 'ease-in-back'
-  | 'ease-out-back'
-  | 'ease-in-out-back'
-  | 'ease-in-elastic'
-  | 'ease-out-elastic'
-  | 'ease-in-out-elastic'
-  | 'ease-in-bounce'
-  | 'ease-out-bounce'
-  | 'ease-in-out-bounce';
 
 /**
  * Create a default effect parameter

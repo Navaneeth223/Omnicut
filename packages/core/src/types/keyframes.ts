@@ -136,7 +136,8 @@ export function interpolateKeyframes(
   // Handle array values (interpolate each component)
   if (Array.isArray(keyframe1.value) && Array.isArray(keyframe2.value)) {
     return keyframe1.value.map((v1, i) => {
-      const v2 = keyframe2.value[i] as number;
+      const value2 = keyframe2.value as number[];
+      const v2 = value2[i] ?? 0;
       return interpolateNumber(v1, v2, t, keyframe1.easing);
     });
   }
