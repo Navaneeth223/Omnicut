@@ -1,6 +1,5 @@
 {
-  "version": 2,
-  "buildCommand": "turbo run build --filter=@omnicut/web",
+  "buildCommand": "pnpm build",
   "outputDirectory": "apps/web/dist",
   "installCommand": "pnpm install",
   "framework": null,
