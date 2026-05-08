@@ -1,6 +1,6 @@
 /**
  * AI Voice Studio Component
- * Text-to-speech and voice generation (like ElevenLabs)
+ * Text-to-speech and Real-Time Voice Transform
  */
 
 import { useState, useCallback } from 'react';
@@ -9,6 +9,7 @@ import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
 import { useToast } from '../../hooks/useToast';
 import { LoadingOverlay } from '../Loading/Loading';
+import { RealTimeVoice } from './RealTimeVoice';
 import './AIVoice.css';
 
 interface Voice {
@@ -19,6 +20,8 @@ interface Voice {
   accent: string;
   preview: string;
 }
+
+type Tab = 'text-to-speech' | 'real-time';
 
 const VOICES: Voice[] = [
   {
@@ -72,6 +75,7 @@ const VOICES: Voice[] = [
 ];
 
 export function AIVoice() {
+  const [activeTab, setActiveTab] = useState<Tab>('text-to-speech');
   const [text, setText] = useState('');
   const [selectedVoice, setSelectedVoice] = useState<Voice | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -166,8 +170,29 @@ export function AIVoice() {
         </p>
       </div>
 
-      {/* Progress Steps */}
-      <div className="ai-voice__steps">
+      {/* Tab Navigation */}
+      <div className="ai-voice__tabs">
+        <button
+          className={`tab-btn ${activeTab === 'text-to-speech' ? 'tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('text-to-speech')}
+        >
+          <span className="tab-icon">📝</span>
+          <span className="tab-label">Text-to-Speech</span>
+        </button>
+        <button
+          className={`tab-btn ${activeTab === 'real-time' ? 'tab-btn--active' : ''}`}
+          onClick={() => setActiveTab('real-time')}
+        >
+          <span className="tab-icon">🎤</span>
+          <span className="tab-label">Real-Time Voice</span>
+        </button>
+      </div>
+
+      {/* Tab Content */}
+      {activeTab === 'text-to-speech' ? (
+        <>
+          {/* Progress Steps */}
+          <div className="ai-voice__steps">
         <div className={`step ${step === 'text' ? 'step--active' : step !== 'text' ? 'step--complete' : ''}`}>
           <div className="step__number">1</div>
           <div className="step__label">Text</div>
@@ -328,6 +353,10 @@ export function AIVoice() {
           <strong>Note:</strong> This is a demo. In production, this would integrate with services like ElevenLabs, Google Cloud TTS, or Azure Speech.
         </div>
       </div>
+        </>
+      ) : (
+        <RealTimeVoice />
+      )}
     </div>
   );
 }

@@ -38,6 +38,53 @@
   font-weight: 500;
 }
 
+/* Tab Navigation */
+.ai-voice__tabs {
+  display: flex;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-10);
+  background: var(--bg-panel);
+  border-bottom: 1px solid var(--border-faint);
+}
+
+.tab-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: var(--sp-4) var(--sp-5);
+  background: transparent;
+  border: 2px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 220ms var(--ease-out);
+}
+
+.tab-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-normal);
+  color: var(--text-primary);
+}
+
+.tab-btn--active {
+  background: var(--accent-gradient);
+  border-color: var(--accent-1);
+  color: white;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+
+.tab-icon {
+  font-size: 1.25rem;
+}
+
+.tab-label {
+  font-size: 0.9375rem;
+}
+
 /* Progress Steps */
 .ai-voice__steps {
   display: flex;

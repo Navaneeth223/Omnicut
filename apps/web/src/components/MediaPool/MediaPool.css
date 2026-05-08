@@ -9,6 +9,9 @@
   background: var(--bg-panel);
   overflow: hidden;
   position: relative;
+  min-width: 200px;
+  max-width: 600px;
+  transition: width 0.1s ease-out;
 }
 
 /* Header */

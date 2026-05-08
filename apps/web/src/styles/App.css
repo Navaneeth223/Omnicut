@@ -56,15 +56,15 @@
 
 /* ── Right Panel (Effects/Transitions) ────────── */
 .panel--right {
-  width: 340px;
-  min-width: 340px;
-  max-width: 400px;
+  min-width: 280px;
+  max-width: 500px;
   background: var(--bg-panel);
   border-left: 1px solid var(--border-faint);
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  resize: horizontal; /* Allow horizontal resizing */
+  position: relative;
+  transition: width 0.1s ease-out;
 }
 
 /* ── Viewer Container ─────────────────────────── */
@@ -92,6 +92,22 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   position: relative;
+  isolation: isolate; /* Creates new stacking context */
+}
+
+/* Ensure all canvas/video elements stay contained */
+.viewer__canvas canvas,
+.viewer__canvas video {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
+  overflow: hidden;
+}
+
+/* Force GPU layer containment for animations */
+.viewer__canvas > * {
+  transform: translateZ(0);
 }
 
 .viewer__controls {

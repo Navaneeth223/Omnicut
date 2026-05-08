@@ -46,7 +46,7 @@ export function Toast({ id, message, type, duration = 3000, onClose }: ToastProp
 }
 
 export function ToastContainer({ toasts, onClose }: {
-  toasts: ToastProps[];
+  toasts: Array<Omit<ToastProps, 'onClose'>>;
   onClose: (id: string) => void;
 }) {
   return (

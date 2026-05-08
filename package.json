@@ -1,8 +1,8 @@
 {
   "name": "omnicut",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "private": true,
-  "description": "Professional Creative Suite - Video, Audio, Photo & AI Production",
+  "description": "Professional Creative Suite - Video, Audio, Photo & AI Production with Real-Time Voice Transform",
   "author": "OmniCut Team",
   "license": "MIT",
   "engines": {

@@ -46,6 +46,19 @@
   --track-effect:    #f97316;
   --track-music:     #ec4899;
 
+  /* ── Z-Index Layers ──────────────────────────── */
+  --z-base:          0;
+  --z-clips:         10;
+  --z-playhead:      20;
+  --z-panel:         100;
+  --z-floating:      200;
+  --z-dropdown:      300;
+  --z-tooltip:       400;
+  --z-modal:         500;
+  --z-toast:         600;
+  --z-overlay:       700;
+  --z-top:           999;
+
   /* ── Radii ───────────────────────────────────── */
   --radius-sm:       6px;
   --radius-md:       10px;

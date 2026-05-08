@@ -19,6 +19,7 @@ import { ToastContainer } from './components/Toast/Toast';
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcuts/KeyboardShortcutsDialog';
 import { Loading } from './components/Loading/Loading';
 import { SkipNav } from './components/SkipNav/SkipNav';
+import { ResizeHandle } from './components/ResizeHandle/ResizeHandle';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -26,6 +27,7 @@ import { useToast } from './hooks/useToast';
 import { performanceMonitor } from './utils/performance';
 import { announceToScreenReader } from './utils/accessibility';
 import './styles/App.css';
+import './styles/bug-fixes.css';
 
 // Lazy load workspace components for better performance
 const ShortsStudio = lazy(() => import('./components/ShortsStudio/ShortsStudio').then(m => ({ default: m.ShortsStudio })));
@@ -36,6 +38,12 @@ const ColorGrading = lazy(() => import('./components/ColorGrading/ColorGrading')
 const AudioWorkspace = lazy(() => import('./components/AudioWorkspace/AudioWorkspace').then(m => ({ default: m.AudioWorkspace })));
 const PhotoEditor = lazy(() => import('./components/PhotoEditor/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 
+// Load saved panel widths from localStorage
+const getSavedRightPanelWidth = () => {
+  const saved = localStorage.getItem('rightPanelWidth');
+  return saved ? parseInt(saved, 10) : 340;
+};
+
 function App() {
   const [workspace, setWorkspace] = useState<'edit' | 'shorts' | 'ai-voice' | 'ai-image' | 'ai-video' | 'color' | 'audio' | 'photo'>('shorts');
   const [showExportDialog, setShowExportDialog] = useState(false);
@@ -45,6 +53,7 @@ function App() {
   const [autoSaveInterval, setAutoSaveInterval] = useState(30000);
   const [rightPanelTab, setRightPanelTab] = useState<'effects' | 'transitions'>('effects');
   const [isInitialized, setIsInitialized] = useState(false);
+  const [rightPanelWidth, setRightPanelWidth] = useState(getSavedRightPanelWidth());
 
   // Toast notifications
   const toast = useToast();
@@ -159,6 +168,15 @@ function App() {
     const s = Math.floor(seconds % 60);
     const f = Math.floor((seconds % 1) * (project?.settings.frameRate ?? 30));
     return `${h.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}:${f.toString().padStart(2, '0')}`;
+  };
+
+  // Handle right panel resize
+  const handleRightPanelResize = (delta: number) => {
+    setRightPanelWidth((prev) => {
+      const newWidth = Math.max(280, Math.min(500, prev - delta)); // Subtract delta for left-side resize
+      localStorage.setItem('rightPanelWidth', newWidth.toString());
+      return newWidth;
+    });
   };
 
   // Show loading screen while initializing
@@ -395,7 +413,21 @@ function App() {
           </div>
 
           {/* Right Panel - Effects & Transitions */}
-          <aside className="panel panel--right" role="complementary" aria-label="Effects and Transitions">
+          <aside 
+            className="panel panel--right" 
+            role="complementary" 
+            aria-label="Effects and Transitions"
+            style={{ width: `${rightPanelWidth}px` }}
+          >
+            {/* Resize Handle */}
+            <ResizeHandle
+              panelId="right-panel"
+              direction="horizontal"
+              side="left"
+              onResize={handleRightPanelResize}
+              minSize={280}
+              maxSize={500}
+            />
             <div className="panel__header">
               <div className="panel__tabs">
                 <button

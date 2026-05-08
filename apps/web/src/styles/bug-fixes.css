@@ -1,0 +1,267 @@
+/**
+ * Bug Fixes CSS - OmniCut v3.1
+ * Critical fixes for overflow, clipping, and mobile issues
+ */
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 1: Prevent content overflow on mobile
+   ═══════════════════════════════════════════════════════════ */
+html, body {
+  overflow-x: hidden;
+  overflow-y: hidden;
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height for iOS Safari */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 2: Panel clipping prevention
+   ═══════════════════════════════════════════════════════════ */
+.panel {
+  max-width: calc(100vw - 48px);
+  max-height: calc(100vh - 52px - 32px); /* viewport - header - statusbar */
+  overflow: hidden;
+}
+
+.panel__content {
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+/* Fix for right panel specifically */
+.panel--right {
+  right: 0;
+  max-width: min(400px, 35vw); /* Never wider than 35% of viewport */
+}
+
+/* Fix for left panel */
+.panel--left {
+  left: 0;
+  max-width: min(320px, 30vw);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 3: Z-index system (no more conflicts)
+   ═══════════════════════════════════════════════════════════ */
+.playhead {
+  z-index: var(--z-playhead);
+}
+
+.panel--floating {
+  z-index: var(--z-floating);
+}
+
+.dropdown,
+.context-menu {
+  z-index: var(--z-dropdown);
+}
+
+.tooltip {
+  z-index: var(--z-tooltip);
+}
+
+.modal,
+.dialog {
+  z-index: var(--z-modal);
+}
+
+.toast,
+.toast-container {
+  z-index: var(--z-toast);
+}
+
+.overlay,
+.modal-overlay {
+  z-index: var(--z-overlay);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 4: iOS Safari safe areas
+   ═══════════════════════════════════════════════════════════ */
+.bottom-nav,
+.status-bar {
+  padding-bottom: max(8px, env(safe-area-inset-bottom));
+  height: calc(56px + env(safe-area-inset-bottom));
+}
+
+.header {
+  padding-top: max(0px, env(safe-area-inset-top));
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 5: Android keyboard handling
+   ═══════════════════════════════════════════════════════════ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .preview-monitor,
+  .viewer-container {
+    display: none; /* Hide preview when keyboard open on small phone */
+  }
+  
+  .timeline {
+    flex: 1;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 6: Touch event handling
+   ═══════════════════════════════════════════════════════════ */
+.timeline-container {
+  touch-action: none; /* Tell browser we handle all touch ourselves */
+}
+
+.panel__content {
+  touch-action: pan-y; /* Allow vertical scrolling */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 7: Dropdown/tooltip smart positioning
+   ═══════════════════════════════════════════════════════════ */
+[data-position="auto"] {
+  position: absolute;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+}
+
+/* Ensure dropdowns don't overflow viewport */
+.dropdown,
+.context-menu,
+.tooltip {
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 8: Canvas/WebGL containment
+   ═══════════════════════════════════════════════════════════ */
+canvas.gl-canvas {
+  overflow: hidden;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+}
+
+/* Preview monitor containment */
+.preview-monitor {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-lg);
+  isolation: isolate;
+}
+
+.preview-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 9: Mobile responsiveness
+   ═══════════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .panel--left,
+  .panel--right {
+    position: fixed;
+    top: 52px;
+    bottom: 0;
+    z-index: var(--z-panel);
+    transform: translateX(-100%);
+    transition: transform 220ms var(--ease-out);
+  }
+  
+  .panel--left.open {
+    transform: translateX(0);
+  }
+  
+  .panel--right {
+    transform: translateX(100%);
+    right: 0;
+  }
+  
+  .panel--right.open {
+    transform: translateX(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 10: Prevent text selection during drag operations
+   ═══════════════════════════════════════════════════════════ */
+.dragging,
+.resizing {
+  user-select: none;
+  cursor: grabbing !important;
+}
+
+.resize-handle {
+  user-select: none;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 11: Scrollbar styling (prevent layout shift)
+   ═══════════════════════════════════════════════════════════ */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.2) transparent;
+}
+
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 12: Focus visible (accessibility)
+   ═══════════════════════════════════════════════════════════ */
+*:focus-visible {
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent-1);
+  outline-offset: 2px;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   FIX 13: Prevent double-tap zoom on mobile
+   ═══════════════════════════════════════════════════════════ */
+button,
+a,
+input,
+select,
+textarea {
+  touch-action: manipulation;
+}

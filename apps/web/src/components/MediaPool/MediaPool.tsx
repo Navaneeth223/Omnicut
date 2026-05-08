@@ -10,14 +10,22 @@ import { Spinner } from '../Loading/Loading';
 import { MediaGrid } from './MediaGrid';
 import { MediaList } from './MediaList';
 import { ImportDialog } from './ImportDialog';
+import { ResizeHandle } from '../ResizeHandle/ResizeHandle';
 import './MediaPool.css';
 
 const mediaImporter = createMediaImporter();
+
+// Load saved panel width from localStorage
+const getSavedWidth = () => {
+  const saved = localStorage.getItem('mediaPoolWidth');
+  return saved ? parseInt(saved, 10) : 300;
+};
 
 export function MediaPool() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
+  const [panelWidth, setPanelWidth] = useState(getSavedWidth());
 
   const toast = useToast();
 
@@ -100,8 +108,24 @@ export function MediaPool() {
     e.preventDefault();
   }, []);
 
+  /**
+   * Handle panel resize
+   */
+  const handleResize = useCallback((delta: number) => {
+    setPanelWidth((prev) => {
+      const newWidth = Math.max(200, Math.min(600, prev + delta));
+      localStorage.setItem('mediaPoolWidth', newWidth.toString());
+      return newWidth;
+    });
+  }, []);
+
   return (
-    <div className="media-pool" onDrop={handleDrop} onDragOver={handleDragOver}>
+    <div 
+      className="media-pool" 
+      onDrop={handleDrop} 
+      onDragOver={handleDragOver}
+      style={{ width: `${panelWidth}px` }}
+    >
       {/* Header */}
       <div className="media-pool__header">
         <h2 className="media-pool__title">Media Pool</h2>
@@ -195,6 +219,15 @@ export function MediaPool() {
           onClose={() => setShowImportDialog(false)}
         />
       )}
+
+      {/* Resize Handle */}
+      <ResizeHandle
+        panelId="media-pool"
+        direction="horizontal"
+        onResize={handleResize}
+        minSize={200}
+        maxSize={600}
+      />
     </div>
   );
 }
