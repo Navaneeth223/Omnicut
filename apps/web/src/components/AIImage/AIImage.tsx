@@ -9,6 +9,7 @@ import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
 import { useToast } from '../../hooks/useToast';
 import { LoadingOverlay } from '../Loading/Loading';
+import { VoiceInput } from '../VoiceInput/VoiceInput';
 import './AIImage.css';
 
 interface ImageBackend {
@@ -312,14 +313,22 @@ export function AIImage() {
             <p className="step-hint">
               Be specific and descriptive. Include style, mood, colors, and details.
             </p>
-            <textarea
-              className="prompt-input"
-              placeholder="Example: A majestic dragon flying over a medieval castle at sunset, cinematic lighting, highly detailed, fantasy art style, vibrant colors..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              maxLength={2000}
-              rows={8}
-            />
+            <div className="prompt-input-wrapper">
+              <textarea
+                className="prompt-input"
+                placeholder="Example: A majestic dragon flying over a medieval castle at sunset, cinematic lighting, highly detailed, fantasy art style, vibrant colors..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                maxLength={2000}
+                rows={8}
+              />
+              <div className="prompt-input-actions">
+                <VoiceInput
+                  onTranscript={(text) => setPrompt(prev => prev + ' ' + text)}
+                  onError={(error) => toast.error(`Voice input error: ${error}`)}
+                />
+              </div>
+            </div>
             <div className="prompt-stats">
               <span>{prompt.length} / 2000 characters</span>
             </div>
@@ -328,14 +337,22 @@ export function AIImage() {
             <p className="step-hint">
               Describe what you DON'T want in the image
             </p>
-            <textarea
-              className="prompt-input prompt-input--small"
-              placeholder="Example: blurry, low quality, distorted, ugly, bad anatomy..."
-              value={negativePrompt}
-              onChange={(e) => setNegativePrompt(e.target.value)}
-              maxLength={1000}
-              rows={4}
-            />
+            <div className="prompt-input-wrapper">
+              <textarea
+                className="prompt-input prompt-input--small"
+                placeholder="Example: blurry, low quality, distorted, ugly, bad anatomy..."
+                value={negativePrompt}
+                onChange={(e) => setNegativePrompt(e.target.value)}
+                maxLength={1000}
+                rows={4}
+              />
+              <div className="prompt-input-actions">
+                <VoiceInput
+                  onTranscript={(text) => setNegativePrompt(prev => prev + ' ' + text)}
+                  onError={(error) => toast.error(`Voice input error: ${error}`)}
+                />
+              </div>
+            </div>
 
             <div className="ai-image__actions">
               <button
@@ -604,8 +621,23 @@ export function AIImage() {
 
 async function generateWithPollinations(prompt: string, aspectRatio: AspectRatio): Promise<string> {
   // Pollinations AI - completely free, no API key required
+  // Using the public anonymous endpoint
   const encodedPrompt = encodeURIComponent(prompt);
-  const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${aspectRatio.width}&height=${aspectRatio.height}&nologo=true`;
+  
+  // Add seed for uniqueness and model parameter
+  const seed = Math.floor(Math.random() * 1000000);
+  const url = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=${aspectRatio.width}&height=${aspectRatio.height}&seed=${seed}&model=flux&nologo=true&enhance=true`;
+  
+  // Test the URL by fetching it
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    if (!response.ok) {
+      throw new Error(`Pollinations API returned ${response.status}`);
+    }
+  } catch (error) {
+    console.error('Pollinations fetch error:', error);
+    // Still return the URL as it might work in img tag
+  }
   
   // Pollinations returns the image directly
   return url;

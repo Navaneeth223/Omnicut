@@ -141,6 +141,11 @@
 }
 
 /* ── Prompt Input ───────────────────────────── */
+.prompt-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
 .prompt-input {
   width: 100%;
   background: var(--bg-surface);
@@ -148,6 +153,7 @@
   border-radius: var(--radius-lg);
   color: var(--text-primary);
   padding: var(--sp-4);
+  padding-bottom: 56px; /* Space for voice button */
   font-size: 14px;
   font-family: var(--font-ui);
   line-height: 1.6;
@@ -163,6 +169,15 @@
 
 .prompt-input--small {
   min-height: 100px;
+}
+
+.prompt-input-actions {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: flex;
+  gap: 8px;
+  z-index: 10;
 }
 
 .prompt-stats {

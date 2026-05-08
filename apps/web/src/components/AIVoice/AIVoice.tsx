@@ -9,6 +9,7 @@ import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
 import { useToast } from '../../hooks/useToast';
 import { LoadingOverlay } from '../Loading/Loading';
+import { VoiceInput } from '../VoiceInput/VoiceInput';
 import { RealTimeVoice } from './RealTimeVoice';
 import './AIVoice.css';
 
@@ -86,7 +87,7 @@ export function AIVoice() {
   const toast = useToast();
 
   /**
-   * Generate voice from text
+   * Generate voice from text using Web Speech API
    */
   const generateVoice = useCallback(async () => {
     if (!text || !selectedVoice) return;
@@ -95,12 +96,51 @@ export function AIVoice() {
     toast.info(`Generating voice with ${selectedVoice.name}...`);
 
     try {
-      // Simulate AI voice generation
-      // In production, this would call an API like ElevenLabs
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-
-      // Create a dummy audio URL (in production, this would be the generated audio)
-      const audioUrl = 'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+      // Use Web Speech Synthesis API
+      const utterance = new SpeechSynthesisUtterance(text);
+      
+      // Get available voices
+      const voices = window.speechSynthesis.getVoices();
+      
+      // Map our voice selection to available system voices
+      let selectedSystemVoice = voices.find(v => {
+        if (selectedVoice.gender === 'male') {
+          return v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('james');
+        } else if (selectedVoice.gender === 'female') {
+          return v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('victoria');
+        }
+        return false;
+      });
+      
+      // Fallback to first available voice
+      if (!selectedSystemVoice && voices.length > 0) {
+        selectedSystemVoice = voices[0];
+      }
+      
+      if (selectedSystemVoice) {
+        utterance.voice = selectedSystemVoice;
+      }
+      
+      // Configure speech parameters
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      // Create audio blob for saving
+      // Note: Web Speech API doesn't provide direct audio output, so we'll create a placeholder
+      // In production, you'd use a service like ElevenLabs or Google Cloud TTS
+      
+      // For now, we'll speak it and create a reference
+      window.speechSynthesis.speak(utterance);
+      
+      // Wait for speech to complete
+      await new Promise((resolve) => {
+        utterance.onend = resolve;
+        utterance.onerror = resolve;
+      });
+      
+      // Create a data URL as placeholder (in production, this would be actual audio file)
+      const audioUrl = `data:audio/wav;base64,${btoa(text)}`; // Placeholder
       
       setGeneratedAudio(audioUrl);
       setStep('preview');
@@ -145,14 +185,84 @@ export function AIVoice() {
   }, [generatedAudio, selectedVoice, text, addMediaItem, toast]);
 
   /**
-   * Reset wizard
+   * Preview voice
    */
-  const reset = () => {
-    setText('');
-    setSelectedVoice(null);
-    setGeneratedAudio(null);
-    setStep('text');
-  };
+  const previewVoice = useCallback((voice: Voice) => {
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    // Create utterance with preview text
+    const utterance = new SpeechSynthesisUtterance(voice.preview);
+    
+    // Get available voices
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Try to match voice
+    let selectedSystemVoice = voices.find(v => {
+      if (voice.gender === 'male') {
+        return v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('james');
+      } else if (voice.gender === 'female') {
+        return v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('victoria');
+      }
+      return false;
+    });
+    
+    if (!selectedSystemVoice && voices.length > 0) {
+      selectedSystemVoice = voices[0];
+    }
+    
+    if (selectedSystemVoice) {
+      utterance.voice = selectedSystemVoice;
+    }
+    
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    window.speechSynthesis.speak(utterance);
+    toast.info(`Playing preview: ${voice.name}`);
+  }, [toast]);
+
+  /**
+   * Play generated audio
+   */
+  const playGeneratedAudio = useCallback(() => {
+    if (!text || !selectedVoice) return;
+    
+    // Stop any ongoing speech
+    window.speechSynthesis.cancel();
+    
+    // Create utterance with full text
+    const utterance = new SpeechSynthesisUtterance(text);
+    
+    // Get available voices
+    const voices = window.speechSynthesis.getVoices();
+    
+    // Try to match voice
+    let selectedSystemVoice = voices.find(v => {
+      if (selectedVoice.gender === 'male') {
+        return v.name.toLowerCase().includes('male') || v.name.toLowerCase().includes('david') || v.name.toLowerCase().includes('james');
+      } else if (selectedVoice.gender === 'female') {
+        return v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('samantha') || v.name.toLowerCase().includes('victoria');
+      }
+      return false;
+    });
+    
+    if (!selectedSystemVoice && voices.length > 0) {
+      selectedSystemVoice = voices[0];
+    }
+    
+    if (selectedSystemVoice) {
+      utterance.voice = selectedSystemVoice;
+    }
+    
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    window.speechSynthesis.speak(utterance);
+    toast.info('Playing voice...');
+  }, [text, selectedVoice, toast]);
 
   return (
     <div className="ai-voice">
@@ -218,14 +328,22 @@ export function AIVoice() {
             <p className="step-hint">
               Type or paste the text you want to convert to speech (max 5000 characters)
             </p>
-            <textarea
-              className="text-input"
-              placeholder="Enter your text here... For example: Welcome to my channel! Today we're going to explore amazing AI tools..."
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              maxLength={5000}
-              rows={12}
-            />
+            <div className="text-input-wrapper">
+              <textarea
+                className="text-input"
+                placeholder="Enter your text here... For example: Welcome to my channel! Today we're going to explore amazing AI tools..."
+                value={text}
+                onChange={(e) => setText(e.target.value)}
+                maxLength={5000}
+                rows={12}
+              />
+              <div className="text-input-actions">
+                <VoiceInput
+                  onTranscript={(transcript) => setText(prev => prev + ' ' + transcript)}
+                  onError={(error) => toast.error(`Voice input error: ${error}`)}
+                />
+              </div>
+            </div>
             <div className="text-stats">
               <span>{text.length} / 5000 characters</span>
               <span>{text.split(' ').filter(w => w).length} words</span>
@@ -270,7 +388,16 @@ export function AIVoice() {
                   </div>
                   <div className="voice-card__description">{voice.description}</div>
                   <div className="voice-card__preview">
-                    <span className="preview-icon">🔊</span>
+                    <button 
+                      className="preview-button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        previewVoice(voice);
+                      }}
+                      type="button"
+                    >
+                      <span className="preview-icon">🔊</span>
+                    </button>
                     <span className="preview-text">{voice.preview}</span>
                   </div>
                 </button>
@@ -318,10 +445,13 @@ export function AIVoice() {
                 {text.substring(0, 200)}{text.length > 200 ? '...' : ''}
               </div>
               <div className="preview-card__controls">
-                <button className="button button--secondary">
+                <button className="button button--secondary" onClick={playGeneratedAudio}>
                   ▶️ Play Preview
                 </button>
-                <button className="button button--secondary">
+                <button className="button button--secondary" onClick={() => {
+                  setStep('voice');
+                  setGeneratedAudio(null);
+                }}>
                   🔄 Regenerate
                 </button>
               </div>
