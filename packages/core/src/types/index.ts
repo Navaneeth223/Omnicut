@@ -29,3 +29,9 @@ export * from './export';
 
 // Plugin types
 export * from './plugin';
+
+// Collaboration types
+export * from './collaboration';
+
+// Cloud sync types
+export * from './cloud';

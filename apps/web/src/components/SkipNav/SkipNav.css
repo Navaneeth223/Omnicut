@@ -1,0 +1,54 @@
+/**
+ * Skip Navigation Styles
+ * Accessibility-first design
+ */
+
+.skip-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+}
+
+.skip-nav__link {
+  position: absolute;
+  top: -100px;
+  left: 0;
+  padding: var(--sp-3) var(--sp-4);
+  background: var(--color-accent);
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 0 0 var(--radius-md) 0;
+  box-shadow: var(--shadow-lg);
+  transition: top 0.2s ease;
+  white-space: nowrap;
+}
+
+.skip-nav__link:focus {
+  top: 0;
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.skip-nav__link:hover {
+  background: var(--color-accent-hover);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .skip-nav__link {
+    border: 2px solid currentColor;
+  }
+  
+  .skip-nav__link:focus {
+    outline-width: 4px;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .skip-nav__link {
+    transition: none;
+  }
+}

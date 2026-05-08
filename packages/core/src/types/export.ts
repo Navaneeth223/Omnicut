@@ -1,416 +1,269 @@
 /**
- * Export and rendering types
- * @module types/export
+ * Advanced Export Types
+ * Extended export options and formats
  */
 
-/**
- * Export preset configuration
- */
-export interface ExportPreset {
-  /** Unique preset identifier */
+export interface ExportFormat {
   id: string;
-  /** Preset name */
   name: string;
-  /** Preset category */
-  category: ExportCategory;
-  /** Container format */
-  container: ContainerFormat;
-  /** Video codec settings */
-  video?: VideoCodecSettings;
-  /** Audio codec settings */
-  audio?: AudioCodecSettings;
-  /** Output resolution (null = use project resolution) */
-  resolution?: { width: number; height: number };
-  /** Frame rate (null = use project frame rate) */
-  frameRate?: number;
-  /** Whether this is a built-in preset */
-  builtIn: boolean;
+  extension: string;
+  mimeType: string;
+  category: 'video' | 'audio' | 'image' | 'gif';
+  codecs: ExportCodec[];
+  supportsAlpha: boolean;
+  supportsAudio: boolean;
 }
 
-/**
- * Export categories
- */
-export type ExportCategory =
-  | 'social-media'
-  | 'broadcast'
-  | 'web'
-  | 'mobile'
-  | 'archive'
-  | 'custom';
-
-/**
- * Container formats
- */
-export type ContainerFormat =
-  | 'mp4'
-  | 'mov'
-  | 'mkv'
-  | 'avi'
-  | 'webm'
-  | 'mxf'
-  | 'wav'
-  | 'mp3'
-  | 'flac'
-  | 'aac'
-  | 'gif'
-  | 'png'
-  | 'jpg'
-  | 'tiff';
-
-/**
- * Video codec settings
- */
-export interface VideoCodecSettings {
-  /** Codec name */
-  codec: VideoCodec;
-  /** Encoding profile */
-  profile?: string;
-  /** Encoding preset (speed vs quality) */
-  preset?: 'ultrafast' | 'superfast' | 'veryfast' | 'faster' | 'fast' | 'medium' | 'slow' | 'slower' | 'veryslow';
-  /** Bitrate mode */
-  bitrateMode: 'CBR' | 'VBR' | 'CRF';
-  /** Target bitrate in bps (for CBR/VBR) */
+export interface ExportCodec {
+  id: string;
+  name: string;
+  type: 'video' | 'audio';
+  quality: 'low' | 'medium' | 'high' | 'lossless';
   bitrate?: number;
-  /** CRF value (for CRF mode, 0-51, lower = better quality) */
-  crf?: number;
-  /** Maximum bitrate in bps (for VBR) */
-  maxBitrate?: number;
-  /** Two-pass encoding */
-  twoPass: boolean;
-  /** GOP size (keyframe interval) */
-  gopSize?: number;
-  /** B-frames */
-  bFrames?: number;
-  /** Pixel format */
-  pixelFormat?: string;
-  /** Color space */
-  colorSpace?: string;
-  /** HDR metadata */
-  hdr?: HDRMetadata;
+  supported: boolean;
 }
 
-/**
- * Video codecs
- */
-export type VideoCodec =
-  | 'h264'
-  | 'h265'
-  | 'av1'
-  | 'vp9'
-  | 'vp8'
-  | 'prores'
-  | 'dnxhd'
-  | 'dnxhr'
-  | 'cineform'
-  | 'mjpeg'
-  | 'mpeg2';
-
-/**
- * Audio codec settings
- */
-export interface AudioCodecSettings {
-  /** Codec name */
-  codec: AudioCodec;
-  /** Bitrate in bps */
-  bitrate: number;
-  /** Sample rate in Hz */
-  sampleRate: number;
-  /** Bit depth */
-  bitDepth?: number;
-  /** Number of channels */
-  channels: number;
-  /** Channel layout */
-  channelLayout?: 'mono' | 'stereo' | '5.1' | '7.1';
-}
-
-/**
- * Audio codecs
- */
-export type AudioCodec =
-  | 'aac'
-  | 'mp3'
-  | 'opus'
-  | 'vorbis'
-  | 'flac'
-  | 'alac'
-  | 'pcm'
-  | 'ac3'
-  | 'eac3';
-
-/**
- * HDR metadata
- */
-export interface HDRMetadata {
-  /** HDR standard */
-  standard: 'HDR10' | 'HDR10+' | 'HLG' | 'Dolby Vision';
-  /** Master display color primaries */
-  masterDisplay?: {
-    redX: number;
-    redY: number;
-    greenX: number;
-    greenY: number;
-    blueX: number;
-    blueY: number;
-    whiteX: number;
-    whiteY: number;
-    maxLuminance: number;
-    minLuminance: number;
-  };
-  /** Maximum content light level */
-  maxCLL?: number;
-  /** Maximum frame-average light level */
-  maxFALL?: number;
-}
-
-/**
- * Export settings for dialog
- */
-export interface ExportSettings {
-  /** Output format */
-  format: 'mp4' | 'webm' | 'mov';
-  /** Video codec */
-  codec: 'h264' | 'h265' | 'vp9' | 'av1';
-  /** Output resolution */
+export interface ExportPreset {
+  id: string;
+  name: string;
+  description: string;
+  category: 'web' | 'social' | 'broadcast' | 'archive' | 'custom';
+  format: string;
   resolution: {
     width: number;
     height: number;
   };
-  /** Frame rate */
   frameRate: number;
-  /** Video bitrate in kbps */
-  bitrate: number;
-  /** Quality preset */
-  quality: 'low' | 'medium' | 'high' | 'ultra';
-  /** Audio codec */
-  audioCodec: 'aac' | 'mp3' | 'opus';
-  /** Audio bitrate in kbps */
+  videoBitrate: number;
   audioBitrate: number;
-  /** Start time in seconds */
-  startTime: number;
-  /** End time in seconds */
-  endTime: number;
+  videoCodec: string;
+  audioCodec: string;
+  quality: 'low' | 'medium' | 'high' | 'ultra';
 }
 
-/**
- * Export job
- */
-export interface ExportJob {
-  /** Unique job identifier */
-  id: string;
-  /** Job name */
-  name: string;
-  /** Export preset */
-  preset: ExportPreset;
-  /** Output file path */
-  outputPath: string;
-  /** In point (seconds, null = start of timeline) */
-  inPoint: number | null;
-  /** Out point (seconds, null = end of timeline) */
-  outPoint: number | null;
-  /** Job status */
-  status: ExportJobStatus;
-  /** Progress (0-1) */
-  progress: number;
-  /** Current frame being rendered */
-  currentFrame: number;
-  /** Total frames to render */
-  totalFrames: number;
-  /** Estimated time remaining in seconds */
-  estimatedTimeRemaining: number;
-  /** Data rate in bps */
-  dataRate: number;
-  /** File size in bytes */
-  fileSize: number;
-  /** Error message (if failed) */
-  error?: string;
-  /** Creation timestamp */
-  createdAt: Date;
-  /** Start timestamp */
-  startedAt?: Date;
-  /** Completion timestamp */
-  completedAt?: Date;
-}
-
-/**
- * Export job status
- */
-export type ExportJobStatus =
-  | 'queued'
-  | 'preparing'
-  | 'rendering'
-  | 'finalizing'
-  | 'completed'
-  | 'failed'
-  | 'cancelled';
-
-/**
- * Built-in export presets
- */
-export const BUILT_IN_PRESETS: Record<string, ExportPreset> = {
-  YOUTUBE_1080P: {
-    id: 'youtube-1080p',
-    name: 'YouTube 1080p',
-    category: 'social-media',
-    container: 'mp4',
-    video: {
-      codec: 'h264',
-      profile: 'high',
-      preset: 'medium',
-      bitrateMode: 'VBR',
-      bitrate: 8_000_000,
-      maxBitrate: 12_000_000,
-      twoPass: false,
-    },
-    audio: {
-      codec: 'aac',
-      bitrate: 192_000,
-      sampleRate: 48000,
-      channels: 2,
-      channelLayout: 'stereo',
-    },
-    resolution: { width: 1920, height: 1080 },
-    builtIn: true,
-  },
-  YOUTUBE_4K: {
-    id: 'youtube-4k',
-    name: 'YouTube 4K',
-    category: 'social-media',
-    container: 'mp4',
-    video: {
-      codec: 'h265',
-      profile: 'main',
-      preset: 'medium',
-      bitrateMode: 'VBR',
-      bitrate: 45_000_000,
-      maxBitrate: 60_000_000,
-      twoPass: false,
-    },
-    audio: {
-      codec: 'aac',
-      bitrate: 320_000,
-      sampleRate: 48000,
-      channels: 2,
-      channelLayout: 'stereo',
-    },
-    resolution: { width: 3840, height: 2160 },
-    builtIn: true,
-  },
-  INSTAGRAM_FEED: {
-    id: 'instagram-feed',
-    name: 'Instagram Feed (1:1)',
-    category: 'social-media',
-    container: 'mp4',
-    video: {
-      codec: 'h264',
-      profile: 'high',
-      preset: 'medium',
-      bitrateMode: 'VBR',
-      bitrate: 5_000_000,
-      maxBitrate: 8_000_000,
-      twoPass: false,
-    },
-    audio: {
-      codec: 'aac',
-      bitrate: 128_000,
-      sampleRate: 48000,
-      channels: 2,
-      channelLayout: 'stereo',
-    },
-    resolution: { width: 1080, height: 1080 },
-    builtIn: true,
-  },
-  INSTAGRAM_REELS: {
-    id: 'instagram-reels',
-    name: 'Instagram Reels (9:16)',
-    category: 'social-media',
-    container: 'mp4',
-    video: {
-      codec: 'h264',
-      profile: 'high',
-      preset: 'medium',
-      bitrateMode: 'VBR',
-      bitrate: 5_000_000,
-      maxBitrate: 8_000_000,
-      twoPass: false,
-    },
-    audio: {
-      codec: 'aac',
-      bitrate: 128_000,
-      sampleRate: 48000,
-      channels: 2,
-      channelLayout: 'stereo',
-    },
-    resolution: { width: 1080, height: 1920 },
-    builtIn: true,
-  },
-  PRORES_422: {
-    id: 'prores-422',
-    name: 'ProRes 422',
-    category: 'archive',
-    container: 'mov',
-    video: {
-      codec: 'prores',
-      profile: '422',
-      preset: 'medium',
-      bitrateMode: 'VBR',
-      twoPass: false,
-    },
-    audio: {
-      codec: 'pcm',
-      bitrate: 1_536_000,
-      sampleRate: 48000,
-      bitDepth: 24,
-      channels: 2,
-      channelLayout: 'stereo',
-    },
-    builtIn: true,
-  },
-};
-
-/**
- * Create a default export preset
- */
-export function createDefaultExportPreset(name: string): Omit<ExportPreset, 'id'> {
-  return {
-    name,
-    category: 'custom',
-    container: 'mp4',
-    video: {
-      codec: 'h264',
-      profile: 'high',
-      preset: 'medium',
-      bitrateMode: 'CRF',
-      crf: 23,
-      twoPass: false,
-    },
-    audio: {
-      codec: 'aac',
-      bitrate: 192_000,
-      sampleRate: 48000,
-      channels: 2,
-      channelLayout: 'stereo',
-    },
-    builtIn: false,
+export interface ExportOptions {
+  format: string;
+  preset?: string;
+  
+  // Video settings
+  resolution?: {
+    width: number;
+    height: number;
+  };
+  frameRate?: number;
+  videoBitrate?: number;
+  videoCodec?: string;
+  videoQuality?: number; // 0-100
+  
+  // Audio settings
+  audioBitrate?: number;
+  audioCodec?: string;
+  audioChannels?: 1 | 2 | 6 | 8;
+  audioSampleRate?: 44100 | 48000 | 96000;
+  
+  // Advanced
+  hardwareAcceleration?: boolean;
+  twoPass?: boolean;
+  startTime?: number;
+  endTime?: number;
+  includeAlpha?: boolean;
+  
+  // Metadata
+  metadata?: {
+    title?: string;
+    author?: string;
+    description?: string;
+    copyright?: string;
+    tags?: string[];
   };
 }
 
-/**
- * Estimate file size based on settings
- */
-export function estimateFileSize(
-  preset: ExportPreset,
-  durationSeconds: number
-): number {
-  let totalBitrate = 0;
-
-  if (preset.video?.bitrate) {
-    totalBitrate += preset.video.bitrate;
-  }
-
-  if (preset.audio?.bitrate) {
-    totalBitrate += preset.audio.bitrate;
-  }
-
-  // Convert to bytes
-  return (totalBitrate / 8) * durationSeconds;
+export interface ExportJob {
+  id: string;
+  projectId: string;
+  status: 'queued' | 'processing' | 'completed' | 'failed' | 'cancelled';
+  progress: number;
+  options: ExportOptions;
+  outputPath?: string;
+  outputSize?: number;
+  startedAt?: Date;
+  completedAt?: Date;
+  duration?: number;
+  error?: string;
 }
+
+export interface ExportQueue {
+  jobs: ExportJob[];
+  activeJob?: ExportJob;
+  maxConcurrent: number;
+}
+
+export interface ExportTemplate {
+  id: string;
+  name: string;
+  description: string;
+  options: ExportOptions;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+// Predefined export presets
+export const EXPORT_PRESETS: ExportPreset[] = [
+  // Web presets
+  {
+    id: 'web-1080p',
+    name: 'Web 1080p',
+    description: 'Optimized for web streaming',
+    category: 'web',
+    format: 'mp4',
+    resolution: { width: 1920, height: 1080 },
+    frameRate: 30,
+    videoBitrate: 5000,
+    audioBitrate: 192,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    quality: 'high',
+  },
+  {
+    id: 'web-720p',
+    name: 'Web 720p',
+    description: 'Balanced quality and file size',
+    category: 'web',
+    format: 'mp4',
+    resolution: { width: 1280, height: 720 },
+    frameRate: 30,
+    videoBitrate: 2500,
+    audioBitrate: 128,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    quality: 'medium',
+  },
+  
+  // Social media presets
+  {
+    id: 'youtube-1080p',
+    name: 'YouTube 1080p',
+    description: 'Optimized for YouTube',
+    category: 'social',
+    format: 'mp4',
+    resolution: { width: 1920, height: 1080 },
+    frameRate: 60,
+    videoBitrate: 8000,
+    audioBitrate: 192,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    quality: 'high',
+  },
+  {
+    id: 'instagram-story',
+    name: 'Instagram Story',
+    description: '9:16 vertical format',
+    category: 'social',
+    format: 'mp4',
+    resolution: { width: 1080, height: 1920 },
+    frameRate: 30,
+    videoBitrate: 3500,
+    audioBitrate: 128,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    quality: 'high',
+  },
+  {
+    id: 'tiktok',
+    name: 'TikTok',
+    description: '9:16 vertical format',
+    category: 'social',
+    format: 'mp4',
+    resolution: { width: 1080, height: 1920 },
+    frameRate: 30,
+    videoBitrate: 3000,
+    audioBitrate: 128,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    quality: 'high',
+  },
+  
+  // Broadcast presets
+  {
+    id: 'broadcast-1080p',
+    name: 'Broadcast 1080p',
+    description: 'Professional broadcast quality',
+    category: 'broadcast',
+    format: 'mp4',
+    resolution: { width: 1920, height: 1080 },
+    frameRate: 30,
+    videoBitrate: 15000,
+    audioBitrate: 320,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    quality: 'ultra',
+  },
+  
+  // Archive presets
+  {
+    id: 'archive-4k',
+    name: 'Archive 4K',
+    description: 'Highest quality for archival',
+    category: 'archive',
+    format: 'mp4',
+    resolution: { width: 3840, height: 2160 },
+    frameRate: 60,
+    videoBitrate: 40000,
+    audioBitrate: 320,
+    videoCodec: 'h264',
+    audioCodec: 'aac',
+    quality: 'ultra',
+  },
+];
+
+export const EXPORT_FORMATS: ExportFormat[] = [
+  {
+    id: 'mp4',
+    name: 'MP4 (H.264)',
+    extension: '.mp4',
+    mimeType: 'video/mp4',
+    category: 'video',
+    codecs: [
+      { id: 'h264', name: 'H.264', type: 'video', quality: 'high', supported: true },
+      { id: 'aac', name: 'AAC', type: 'audio', quality: 'high', supported: true },
+    ],
+    supportsAlpha: false,
+    supportsAudio: true,
+  },
+  {
+    id: 'webm',
+    name: 'WebM (VP9)',
+    extension: '.webm',
+    mimeType: 'video/webm',
+    category: 'video',
+    codecs: [
+      { id: 'vp9', name: 'VP9', type: 'video', quality: 'high', supported: true },
+      { id: 'opus', name: 'Opus', type: 'audio', quality: 'high', supported: true },
+    ],
+    supportsAlpha: true,
+    supportsAudio: true,
+  },
+  {
+    id: 'mov',
+    name: 'QuickTime (MOV)',
+    extension: '.mov',
+    mimeType: 'video/quicktime',
+    category: 'video',
+    codecs: [
+      { id: 'h264', name: 'H.264', type: 'video', quality: 'high', supported: true },
+      { id: 'aac', name: 'AAC', type: 'audio', quality: 'high', supported: true },
+    ],
+    supportsAlpha: true,
+    supportsAudio: true,
+  },
+  {
+    id: 'gif',
+    name: 'Animated GIF',
+    extension: '.gif',
+    mimeType: 'image/gif',
+    category: 'gif',
+    codecs: [],
+    supportsAlpha: true,
+    supportsAudio: false,
+  },
+];

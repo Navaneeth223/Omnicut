@@ -1,8 +1,9 @@
 /**
  * Main Application Component - Complete Integration
+ * With Performance Optimization: Route-based code splitting
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import { useProjectStore, useTimelineStore, useMediaPoolStore, useHistoryStore } from '@omnicut/store';
 import { VERSION, createDefaultProject, generateId } from '@omnicut/core';
 import { Header } from './components/Header/Header';
@@ -14,20 +15,26 @@ import { SettingsDialog } from './components/Settings/SettingsDialog';
 import { EffectsPanel } from './components/Effects/EffectsPanel';
 import { TransitionsPanel } from './components/Transitions/TransitionsPanel';
 import { VideoViewer } from './components/Viewer/VideoViewer';
-import { ShortsStudio } from './components/ShortsStudio/ShortsStudio';
-import { AIVoice } from './components/AIVoice/AIVoice';
-import { AIImage } from './components/AIImage/AIImage';
-import { AIVideo } from './components/AIVideo/AIVideo';
-import { ColorGrading } from './components/ColorGrading/ColorGrading';
-import { AudioWorkspace } from './components/AudioWorkspace/AudioWorkspace';
-import { PhotoEditor } from './components/PhotoEditor/PhotoEditor';
 import { ToastContainer } from './components/Toast/Toast';
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcuts/KeyboardShortcutsDialog';
+import { Loading } from './components/Loading/Loading';
+import { SkipNav } from './components/SkipNav/SkipNav';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
 import { useToast } from './hooks/useToast';
+import { performanceMonitor } from './utils/performance';
+import { announceToScreenReader } from './utils/accessibility';
 import './styles/App.css';
+
+// Lazy load workspace components for better performance
+const ShortsStudio = lazy(() => import('./components/ShortsStudio/ShortsStudio').then(m => ({ default: m.ShortsStudio })));
+const AIVoice = lazy(() => import('./components/AIVoice/AIVoice').then(m => ({ default: m.AIVoice })));
+const AIImage = lazy(() => import('./components/AIImage/AIImage').then(m => ({ default: m.AIImage })));
+const AIVideo = lazy(() => import('./components/AIVideo/AIVideo').then(m => ({ default: m.AIVideo })));
+const ColorGrading = lazy(() => import('./components/ColorGrading/ColorGrading').then(m => ({ default: m.ColorGrading })));
+const AudioWorkspace = lazy(() => import('./components/AudioWorkspace/AudioWorkspace').then(m => ({ default: m.AudioWorkspace })));
+const PhotoEditor = lazy(() => import('./components/PhotoEditor/PhotoEditor').then(m => ({ default: m.PhotoEditor })));
 
 function App() {
   const [workspace, setWorkspace] = useState<'edit' | 'shorts' | 'ai-voice' | 'ai-image' | 'ai-video' | 'color' | 'audio' | 'photo'>('shorts');
@@ -132,10 +139,18 @@ function App() {
       
       // Mark as initialized
       setIsInitialized(true);
+      
+      // Announce to screen readers
+      announceToScreenReader('OmniCut loaded successfully. Press question mark for keyboard shortcuts.');
     } else {
       setIsInitialized(true);
     }
   }, [project, createProject, initTimeline, addTrack, initMediaPool]);
+
+  // Log performance metrics on workspace change
+  useEffect(() => {
+    announceToScreenReader(`Switched to ${workspace} workspace`);
+  }, [workspace]);
 
   // Format timecode
   const formatTimecode = (seconds: number) => {
@@ -188,7 +203,10 @@ function App() {
   }
 
   return (
-    <div className="app">
+    <div className="app" role="application" aria-label="OmniCut Video Editor">
+      {/* Skip Navigation for Accessibility */}
+      <SkipNav />
+      
       {/* New Premium Header */}
       <Header
         workspace={workspace}
@@ -220,32 +238,33 @@ function App() {
       )}
 
       {/* Main Content */}
-      <main className="main-content">
-        {workspace === 'shorts' ? (
-          <ShortsStudio />
-        ) : workspace === 'ai-voice' ? (
-          <AIVoice />
-        ) : workspace === 'ai-image' ? (
-          <AIImage />
-        ) : workspace === 'ai-video' ? (
-          <AIVideo />
-        ) : workspace === 'color' ? (
-          <ColorGrading />
-        ) : workspace === 'audio' ? (
-          <AudioWorkspace />
-        ) : workspace === 'photo' ? (
-          <PhotoEditor />
-        ) : (
+      <main className="main-content" id="main-content" role="main" aria-label="Main workspace">
+        <Suspense fallback={<Loading variant="spinner" message={`Loading ${workspace} workspace...`} />}>
+          {workspace === 'shorts' ? (
+            <ShortsStudio />
+          ) : workspace === 'ai-voice' ? (
+            <AIVoice />
+          ) : workspace === 'ai-image' ? (
+            <AIImage />
+          ) : workspace === 'ai-video' ? (
+            <AIVideo />
+          ) : workspace === 'color' ? (
+            <ColorGrading />
+          ) : workspace === 'audio' ? (
+            <AudioWorkspace />
+          ) : workspace === 'photo' ? (
+            <PhotoEditor />
+          ) : (
           <div className="layout">
           {/* Left Panel - Media Pool */}
-          <aside className="panel panel--left">
+          <aside className="panel panel--left" id="media-pool" role="complementary" aria-label="Media Pool">
             <MediaPool />
           </aside>
 
           {/* Center - Viewer & Timeline */}
           <div className="center-area">
             {/* Viewer */}
-            <div className="viewer-container">
+            <div className="viewer-container" role="region" aria-label="Video Preview">
               <div className="viewer">
                 <div className="viewer__canvas">
                   <VideoViewer />
@@ -300,8 +319,8 @@ function App() {
             </div>
 
             {/* Timeline */}
-            <div className="timeline-container">
-              <div className="timeline-toolbar">
+            <div className="timeline-container" id="timeline" role="region" aria-label="Timeline Editor">
+              <div className="timeline-toolbar" role="toolbar" aria-label="Timeline Tools">
                 <div className="timeline-toolbar__left">
                   <button
                     className="icon-button"
@@ -376,7 +395,7 @@ function App() {
           </div>
 
           {/* Right Panel - Effects & Transitions */}
-          <aside className="panel panel--right">
+          <aside className="panel panel--right" role="complementary" aria-label="Effects and Transitions">
             <div className="panel__header">
               <div className="panel__tabs">
                 <button
@@ -399,6 +418,7 @@ function App() {
           </aside>
         </div>
         )}
+        </Suspense>
       </main>
 
       {/* Status Bar */}

@@ -49,3 +49,30 @@ export function LoadingDots() {
     </div>
   );
 }
+
+// Unified Loading component for Suspense fallback
+export interface LoadingProps {
+  variant?: 'spinner' | 'overlay' | 'dots' | 'skeleton';
+  message?: string;
+  size?: 'small' | 'medium' | 'large';
+}
+
+export function Loading({ variant = 'spinner', message, size = 'medium' }: LoadingProps) {
+  switch (variant) {
+    case 'overlay':
+      return <LoadingOverlay message={message} />;
+    case 'dots':
+      return <LoadingDots />;
+    case 'skeleton':
+      return <SkeletonCard />;
+    case 'spinner':
+    default:
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem', gap: '1rem' }}>
+          <Spinner size={size} />
+          {message && <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.875rem' }}>{message}</p>}
+        </div>
+      );
+  }
+}
+

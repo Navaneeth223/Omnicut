@@ -1,8 +1,8 @@
 {
   "name": "omnicut",
-  "version": "1.0.0-alpha",
+  "version": "3.0.0",
   "private": true,
-  "description": "The Ultimate Open-Source Video, Audio, Photo & Production Suite",
+  "description": "Professional Creative Suite - Video, Audio, Photo & AI Production",
   "author": "OmniCut Team",
   "license": "MIT",
   "engines": {
