@@ -21,19 +21,26 @@ import { AIVideo } from './components/AIVideo/AIVideo';
 import { ColorGrading } from './components/ColorGrading/ColorGrading';
 import { AudioWorkspace } from './components/AudioWorkspace/AudioWorkspace';
 import { PhotoEditor } from './components/PhotoEditor/PhotoEditor';
+import { ToastContainer } from './components/Toast/Toast';
+import { KeyboardShortcutsDialog } from './components/KeyboardShortcuts/KeyboardShortcutsDialog';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
+import { useToast } from './hooks/useToast';
 import './styles/App.css';
 
 function App() {
   const [workspace, setWorkspace] = useState<'edit' | 'shorts' | 'ai-voice' | 'ai-image' | 'ai-video' | 'color' | 'audio' | 'photo'>('shorts');
   const [showExportDialog, setShowExportDialog] = useState(false);
   const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showKeyboardShortcuts, setShowKeyboardShortcuts] = useState(false);
   const [showAutoSaveIndicator, setShowAutoSaveIndicator] = useState(false);
   const [autoSaveInterval, setAutoSaveInterval] = useState(30000);
   const [rightPanelTab, setRightPanelTab] = useState<'effects' | 'transitions'>('effects');
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // Toast notifications
+  const toast = useToast();
 
   // Project state
   const project = useProjectStore((state) => state.project);
@@ -73,11 +80,27 @@ function App() {
       // Show save indicator briefly
       setShowAutoSaveIndicator(true);
       setTimeout(() => setShowAutoSaveIndicator(false), 2000);
+      toast.success('Project saved');
     },
     onError: (error) => {
       console.error('Auto-save failed:', error);
+      toast.error('Failed to save project');
     },
   });
+
+  // Keyboard shortcut for help dialog (?)
+  useEffect(() => {
+    const handleKeyPress = (e: KeyboardEvent) => {
+      // Check if ? key is pressed (Shift + /)
+      if (e.key === '?' && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        e.preventDefault();
+        setShowKeyboardShortcuts(true);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyPress);
+    return () => window.removeEventListener('keydown', handleKeyPress);
+  }, []);
 
   // Initialize default project on mount
   useEffect(() => {
@@ -431,6 +454,14 @@ function App() {
           onAutoSaveIntervalChange={setAutoSaveInterval}
         />
       )}
+
+      {/* Keyboard Shortcuts Dialog */}
+      {showKeyboardShortcuts && (
+        <KeyboardShortcutsDialog onClose={() => setShowKeyboardShortcuts(false)} />
+      )}
+
+      {/* Toast Notifications */}
+      <ToastContainer toasts={toast.toasts} onClose={toast.removeToast} />
     </div>
   );
 }
