@@ -54,6 +54,11 @@ function App() {
   const [rightPanelTab, setRightPanelTab] = useState<'effects' | 'transitions'>('effects');
   const [isInitialized, setIsInitialized] = useState(false);
   const [rightPanelWidth, setRightPanelWidth] = useState(getSavedRightPanelWidth());
+  
+  // Panel visibility states
+  const [showMediaPool, setShowMediaPool] = useState(true);
+  const [showRightPanel, setShowRightPanel] = useState(true);
+  const [showTimeline, setShowTimeline] = useState(true);
 
   // Toast notifications
   const toast = useToast();
@@ -288,9 +293,24 @@ function App() {
           ) : (
           <div className="layout">
           {/* Left Panel - Media Pool */}
-          <aside className="panel panel--left" id="media-pool" role="complementary" aria-label="Media Pool">
-            <MediaPool />
-          </aside>
+          {showMediaPool && (
+            <aside className="panel panel--left" id="media-pool" role="complementary" aria-label="Media Pool">
+              <div className="panel-header">
+                <h3 className="panel-title">Media Pool</h3>
+                <div className="panel-controls">
+                  <button
+                    className="panel-control-btn"
+                    onClick={() => setShowMediaPool(false)}
+                    title="Close Media Pool"
+                    aria-label="Close Media Pool"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+              <MediaPool />
+            </aside>
+          )}
 
           {/* Center - Viewer & Timeline */}
           <div className="center-area">
@@ -426,41 +446,51 @@ function App() {
           </div>
 
           {/* Right Panel - Effects & Transitions */}
-          <aside 
-            className="panel panel--right" 
-            role="complementary" 
-            aria-label="Effects and Transitions"
-            style={{ width: `${rightPanelWidth}px` }}
-          >
-            {/* Resize Handle */}
-            <ResizeHandle
-              panelId="right-panel"
-              direction="horizontal"
-              side="left"
-              onResize={handleRightPanelResize}
-              minSize={280}
-              maxSize={500}
-            />
-            <div className="panel__header">
-              <div className="panel__tabs">
+          {showRightPanel && (
+            <aside 
+              className="panel panel--right" 
+              role="complementary" 
+              aria-label="Effects and Transitions"
+              style={{ width: `${rightPanelWidth}px` }}
+            >
+              {/* Resize Handle */}
+              <ResizeHandle
+                panelId="right-panel"
+                direction="horizontal"
+                side="left"
+                onResize={handleRightPanelResize}
+                minSize={280}
+                maxSize={500}
+              />
+              <div className="panel__header">
+                <div className="panel__tabs">
+                  <button
+                    className={`panel__tab ${rightPanelTab === 'effects' ? 'panel__tab--active' : ''}`}
+                    onClick={() => setRightPanelTab('effects')}
+                  >
+                    Effects
+                  </button>
+                  <button
+                    className={`panel__tab ${rightPanelTab === 'transitions' ? 'panel__tab--active' : ''}`}
+                    onClick={() => setRightPanelTab('transitions')}
+                  >
+                    Transitions
+                  </button>
+                </div>
                 <button
-                  className={`panel__tab ${rightPanelTab === 'effects' ? 'panel__tab--active' : ''}`}
-                  onClick={() => setRightPanelTab('effects')}
+                  className="panel-control-btn"
+                  onClick={() => setShowRightPanel(false)}
+                  title="Close Panel"
+                  aria-label="Close Effects Panel"
                 >
-                  Effects
-                </button>
-                <button
-                  className={`panel__tab ${rightPanelTab === 'transitions' ? 'panel__tab--active' : ''}`}
-                  onClick={() => setRightPanelTab('transitions')}
-                >
-                  Transitions
+                  ✕
                 </button>
               </div>
-            </div>
-            <div className="panel__content panel__content--no-padding">
-              {rightPanelTab === 'effects' ? <EffectsPanel /> : <TransitionsPanel />}
-            </div>
-          </aside>
+              <div className="panel__content panel__content--no-padding">
+                {rightPanelTab === 'effects' ? <EffectsPanel /> : <TransitionsPanel />}
+              </div>
+            </aside>
+          )}
         </div>
         )}
         </Suspense>
