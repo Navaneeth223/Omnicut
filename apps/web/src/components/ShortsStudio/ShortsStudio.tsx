@@ -680,9 +680,10 @@ export function ShortsStudio() {
               <button
                 className="button button--primary"
                 onClick={() => {
-                  // Trigger export dialog
-                  const exportButton = document.querySelector('[title="Export (Ctrl+E)"]') as HTMLButtonElement;
-                  if (exportButton) exportButton.click();
+                  // Navigate to edit workspace to show timeline
+                  const event = new CustomEvent('omnicut:open-export');
+                  window.dispatchEvent(event);
+                  toast.info('Opening export dialog...');
                 }}
               >
                 📤 Export Video

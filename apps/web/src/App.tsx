@@ -88,6 +88,19 @@ function App() {
     onExport: () => setShowExportDialog(true),
   });
 
+  // Listen for export events from AI features
+  useEffect(() => {
+    const handleExportEvent = () => {
+      setShowExportDialog(true);
+    };
+    
+    window.addEventListener('omnicut:open-export', handleExportEvent);
+    
+    return () => {
+      window.removeEventListener('omnicut:open-export', handleExportEvent);
+    };
+  }, []);
+
   // Auto-save hook
   const autoSave = useAutoSave({
     interval: autoSaveInterval,
