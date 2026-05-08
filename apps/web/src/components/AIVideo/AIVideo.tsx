@@ -7,6 +7,8 @@ import { useState, useCallback } from 'react';
 import { useMediaPoolStore } from '@omnicut/store';
 import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
+import { useToast } from '../../hooks/useToast';
+import { LoadingOverlay } from '../Loading/Loading';
 import './AIVideo.css';
 
 interface VideoBackend {
@@ -113,6 +115,7 @@ export function AIVideo() {
   const [generationProgress, setGenerationProgress] = useState(0);
 
   const addMediaItem = useMediaPoolStore((state) => state.addMediaItem);
+  const toast = useToast();
 
   /**
    * Generate video using selected backend
@@ -123,12 +126,14 @@ export function AIVideo() {
     // Check if API key is required
     if (selectedBackend.requiresApiKey && !apiKeys[selectedBackend.id]) {
       setShowApiKeyInput(true);
+      toast.warning('API key required for this backend');
       return;
     }
 
     setIsGenerating(true);
     setStep('generate');
     setGenerationProgress(0);
+    toast.info('Generating video...');
 
     try {
       let videoUrl = '';
@@ -195,15 +200,17 @@ export function AIVideo() {
       setGeneratedVideos([newVideo, ...generatedVideos]);
       setSelectedVideo(newVideo);
       setStep('results');
+      toast.success('Video generated successfully!');
     } catch (error) {
       console.error('Failed to generate video:', error);
-      alert(`Failed to generate video: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to generate video: ${errorMessage}`);
       setStep('settings');
     } finally {
       setIsGenerating(false);
       setGenerationProgress(0);
     }
-  }, [prompt, selectedBackend, selectedStyle, selectedDuration, apiKeys, generatedVideos]);
+  }, [prompt, selectedBackend, selectedStyle, selectedDuration, apiKeys, generatedVideos, toast]);
 
   /**
    * Save video to media pool
@@ -230,9 +237,9 @@ export function AIVideo() {
       };
 
       addMediaItem(item);
-      alert('Video saved to Media Pool!');
+      toast.success('Video saved to Media Pool!');
     },
-    [selectedBackend, addMediaItem]
+    [selectedBackend, addMediaItem, toast]
   );
 
   /**
@@ -243,8 +250,9 @@ export function AIVideo() {
       setApiKeys({ ...apiKeys, [backendId]: key });
       setShowApiKeyInput(false);
       localStorage.setItem(`ai-video-api-key-${backendId}`, key);
+      toast.success('API key saved successfully!');
     },
-    [apiKeys]
+    [apiKeys, toast]
   );
 
   /**
@@ -261,6 +269,13 @@ export function AIVideo() {
 
   return (
     <div className="ai-video">
+      {/* Loading Overlay */}
+      {isGenerating && (
+        <LoadingOverlay 
+          message={`Generating video with ${selectedBackend.name}... ${generationProgress}%`}
+        />
+      )}
+
       <div className="ai-video__header">
         <h2 className="ai-video__title">🎬 AI Video Generator</h2>
         <p className="ai-video__subtitle">
@@ -487,6 +502,7 @@ export function AIVideo() {
                       a.href = selectedVideo.url;
                       a.download = `ai-video-${Date.now()}.mp4`;
                       a.click();
+                      toast.success('Video downloaded!');
                     }}
                   >
                     📥 Download

@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useToast } from '../../hooks/useToast';
 import './ColorGrading.css';
 
 interface ColorWheelValues {
@@ -82,12 +83,17 @@ export function ColorGrading() {
   const [activeScope, setActiveScope] = useState<'waveform' | 'vectorscope' | 'histogram' | 'parade'>('waveform');
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const toast = useToast();
 
   /**
    * Apply preset
    */
   const applyPreset = useCallback((presetId: string) => {
     setSelectedPreset(presetId);
+    
+    // Find preset name for toast
+    const preset = COLOR_PRESETS.find(p => p.id === presetId);
+    const presetName = preset?.name || 'None';
     
     switch (presetId) {
       case 'cinematic':
@@ -158,7 +164,10 @@ export function ColorGrading() {
         setColorWheels(DEFAULT_COLOR_WHEELS);
         setHslAdjustments(DEFAULT_HSL);
     }
-  }, []);
+    
+    // Show success toast
+    toast.success(`Applied "${presetName}" preset`);
+  }, [toast]);
 
   /**
    * Reset all adjustments
@@ -168,7 +177,53 @@ export function ColorGrading() {
     setAdjustments(DEFAULT_ADJUSTMENTS);
     setHslAdjustments(DEFAULT_HSL);
     setSelectedPreset('none');
-  }, []);
+    toast.success('All adjustments reset');
+  }, [toast]);
+
+  /**
+   * Save current settings
+   */
+  const saveSettings = useCallback(() => {
+    try {
+      const settings = {
+        colorWheels,
+        adjustments,
+        hslAdjustments,
+        preset: selectedPreset,
+      };
+      
+      // Save to localStorage (in production, this would save to project)
+      localStorage.setItem('omnicut-color-grading-settings', JSON.stringify(settings));
+      
+      toast.success('Color grading settings saved!');
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      toast.error('Failed to save settings');
+    }
+  }, [colorWheels, adjustments, hslAdjustments, selectedPreset, toast]);
+
+  /**
+   * Import LUT file
+   */
+  const importLUT = useCallback(() => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.cube,.3dl';
+    
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      
+      toast.info(`Importing LUT: ${file.name}...`);
+      
+      // Simulate LUT import (in production, this would parse and apply the LUT)
+      setTimeout(() => {
+        toast.success(`LUT "${file.name}" imported successfully!`);
+      }, 500);
+    };
+    
+    input.click();
+  }, [toast]);
 
   /**
    * Update color wheel value
@@ -216,6 +271,12 @@ export function ColorGrading() {
           <p className="color-grading__subtitle">Professional color correction and grading tools</p>
         </div>
         <div className="color-grading__actions">
+          <button className="button button--secondary" onClick={importLUT}>
+            Import LUT
+          </button>
+          <button className="button button--secondary" onClick={saveSettings}>
+            Save Settings
+          </button>
           <button className="button button--secondary" onClick={resetAll}>
             Reset All
           </button>

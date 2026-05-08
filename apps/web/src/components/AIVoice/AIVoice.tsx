@@ -7,6 +7,8 @@ import { useState, useCallback } from 'react';
 import { useMediaPoolStore } from '@omnicut/store';
 import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
+import { useToast } from '../../hooks/useToast';
+import { LoadingOverlay } from '../Loading/Loading';
 import './AIVoice.css';
 
 interface Voice {
@@ -77,6 +79,7 @@ export function AIVoice() {
   const [step, setStep] = useState<'text' | 'voice' | 'preview'>('text');
 
   const addMediaItem = useMediaPoolStore((state) => state.addMediaItem);
+  const toast = useToast();
 
   /**
    * Generate voice from text
@@ -85,6 +88,7 @@ export function AIVoice() {
     if (!text || !selectedVoice) return;
 
     setIsGenerating(true);
+    toast.info(`Generating voice with ${selectedVoice.name}...`);
 
     try {
       // Simulate AI voice generation
@@ -96,12 +100,15 @@ export function AIVoice() {
       
       setGeneratedAudio(audioUrl);
       setStep('preview');
+      toast.success('Voice generated successfully!');
     } catch (error) {
       console.error('Failed to generate voice:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to generate voice: ${errorMessage}`);
     } finally {
       setIsGenerating(false);
     }
-  }, [text, selectedVoice]);
+  }, [text, selectedVoice, toast]);
 
   /**
    * Save to media pool
@@ -124,13 +131,14 @@ export function AIVoice() {
     };
 
     addMediaItem(item);
+    toast.success('Voice saved to Media Pool!');
 
     // Reset
     setText('');
     setSelectedVoice(null);
     setGeneratedAudio(null);
     setStep('text');
-  }, [generatedAudio, selectedVoice, text, addMediaItem]);
+  }, [generatedAudio, selectedVoice, text, addMediaItem, toast]);
 
   /**
    * Reset wizard
@@ -144,6 +152,13 @@ export function AIVoice() {
 
   return (
     <div className="ai-voice">
+      {/* Loading Overlay */}
+      {isGenerating && (
+        <LoadingOverlay 
+          message={`Generating voice with ${selectedVoice?.name}...`}
+        />
+      )}
+
       <div className="ai-voice__header">
         <h2 className="ai-voice__title">🎙️ AI Voice Studio</h2>
         <p className="ai-voice__subtitle">

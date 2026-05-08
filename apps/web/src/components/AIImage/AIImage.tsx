@@ -7,6 +7,8 @@ import { useState, useCallback } from 'react';
 import { useMediaPoolStore } from '@omnicut/store';
 import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
+import { useToast } from '../../hooks/useToast';
+import { LoadingOverlay } from '../Loading/Loading';
 import './AIImage.css';
 
 interface ImageBackend {
@@ -113,6 +115,7 @@ export function AIImage() {
   const [showApiKeyInput, setShowApiKeyInput] = useState(false);
 
   const addMediaItem = useMediaPoolStore((state) => state.addMediaItem);
+  const toast = useToast();
 
   /**
    * Generate image using selected backend
@@ -123,11 +126,13 @@ export function AIImage() {
     // Check if API key is required
     if (selectedBackend.requiresApiKey && !apiKeys[selectedBackend.id]) {
       setShowApiKeyInput(true);
+      toast.warning('API key required for this backend');
       return;
     }
 
     setIsGenerating(true);
     setStep('generate');
+    toast.info('Generating image...');
 
     try {
       let imageUrl = '';
@@ -195,14 +200,16 @@ export function AIImage() {
       setGeneratedImages([newImage, ...generatedImages]);
       setSelectedImage(newImage);
       setStep('results');
+      toast.success('Image generated successfully!');
     } catch (error) {
       console.error('Failed to generate image:', error);
-      alert(`Failed to generate image: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to generate image: ${errorMessage}`);
       setStep('settings');
     } finally {
       setIsGenerating(false);
     }
-  }, [prompt, negativePrompt, selectedBackend, selectedAspectRatio, apiKeys, generatedImages]);
+  }, [prompt, negativePrompt, selectedBackend, selectedAspectRatio, apiKeys, generatedImages, toast]);
 
   /**
    * Save image to media pool
@@ -226,9 +233,9 @@ export function AIImage() {
       };
 
       addMediaItem(item);
-      alert('Image saved to Media Pool!');
+      toast.success('Image saved to Media Pool!');
     },
-    [selectedBackend, addMediaItem]
+    [selectedBackend, addMediaItem, toast]
   );
 
   /**
@@ -240,8 +247,9 @@ export function AIImage() {
       setShowApiKeyInput(false);
       // Store in localStorage
       localStorage.setItem(`ai-image-api-key-${backendId}`, key);
+      toast.success('API key saved successfully!');
     },
-    [apiKeys]
+    [apiKeys, toast]
   );
 
   /**
@@ -258,6 +266,13 @@ export function AIImage() {
 
   return (
     <div className="ai-image">
+      {/* Loading Overlay */}
+      {isGenerating && (
+        <LoadingOverlay 
+          message={`Generating your image with ${selectedBackend.name}...`}
+        />
+      )}
+
       <div className="ai-image__header">
         <h2 className="ai-image__title">🎨 AI Image Generator</h2>
         <p className="ai-image__subtitle">
@@ -477,6 +492,7 @@ export function AIImage() {
                       a.href = selectedImage.url;
                       a.download = `ai-image-${Date.now()}.png`;
                       a.click();
+                      toast.success('Image downloaded!');
                     }}
                   >
                     📥 Download

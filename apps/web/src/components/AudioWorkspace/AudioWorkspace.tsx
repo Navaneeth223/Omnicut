@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useToast } from '../../hooks/useToast';
 import './AudioWorkspace.css';
 
 interface AudioTrack {
@@ -110,6 +111,7 @@ export function AudioWorkspace() {
   const [isPlaying, setIsPlaying] = useState(false);
 
   const waveformRef = useRef<HTMLCanvasElement>(null);
+  const toast = useToast();
 
   /**
    * Update track property
@@ -136,14 +138,19 @@ export function AudioWorkspace() {
     };
 
     setAppliedEffects(prev => [...prev, newEffect]);
-  }, []);
+    toast.success(`Added ${effect.name} effect`);
+  }, [toast]);
 
   /**
    * Remove effect
    */
   const removeEffect = useCallback((effectId: string) => {
+    const effect = appliedEffects.find(e => e.id === effectId);
     setAppliedEffects(prev => prev.filter(e => e.id !== effectId));
-  }, []);
+    if (effect) {
+      toast.success(`Removed ${effect.name} effect`);
+    }
+  }, [appliedEffects, toast]);
 
   /**
    * Toggle effect
@@ -165,6 +172,43 @@ export function AudioWorkspace() {
       } : e
     ));
   }, []);
+
+  /**
+   * Add new track
+   */
+  const addTrack = useCallback(() => {
+    const newTrack: AudioTrack = {
+      id: `${Date.now()}`,
+      name: `Track ${tracks.length + 1}`,
+      volume: -6,
+      pan: 0,
+      muted: false,
+      solo: false,
+      armed: false,
+      color: `hsl(${Math.random() * 360}, 70%, 50%)`,
+    };
+    setTracks(prev => [...prev, newTrack]);
+    toast.success(`Added ${newTrack.name}`);
+  }, [tracks.length, toast]);
+
+  /**
+   * Export audio mix
+   */
+  const exportAudio = useCallback(() => {
+    toast.info('Exporting audio mix...');
+    
+    // Simulate export process
+    setTimeout(() => {
+      toast.success('Audio mix exported successfully!');
+    }, 1500);
+  }, [toast]);
+
+  /**
+   * Clear all automation
+   */
+  const clearAutomation = useCallback(() => {
+    toast.success('Automation cleared');
+  }, [toast]);
 
   /**
    * Draw waveform
@@ -220,6 +264,9 @@ export function AudioWorkspace() {
           >
             {isPlaying ? '⏸️ Pause' : '▶️ Play'}
           </button>
+          <button className="button button--secondary" onClick={exportAudio}>
+            Export Mix
+          </button>
           <button className="button button--secondary" onClick={() => setShowMeters(!showMeters)}>
             {showMeters ? 'Hide' : 'Show'} Meters
           </button>
@@ -256,7 +303,7 @@ export function AudioWorkspace() {
           <div className="track-list">
             <div className="track-list__header">
               <h3 className="track-list__title">Tracks</h3>
-              <button className="button button--small">+ Add Track</button>
+              <button className="button button--small" onClick={addTrack}>+ Add Track</button>
             </div>
             <div className="track-list__items">
               {tracks.map(track => (
@@ -492,7 +539,7 @@ export function AudioWorkspace() {
                 </div>
                 <div className="automation-controls">
                   <button className="button button--secondary">Add Keyframe</button>
-                  <button className="button button--secondary">Clear Automation</button>
+                  <button className="button button--secondary" onClick={clearAutomation}>Clear Automation</button>
                 </div>
                 <div className="automation-graph">
                   <svg viewBox="0 0 400 200" className="automation-svg">

@@ -7,6 +7,8 @@ import { useState } from 'react';
 import { useProjectStore, useTimelineStore } from '@omnicut/store';
 import { renderTimeline, estimateFileSize } from '@omnicut/media-engine';
 import type { ExportSettings } from '@omnicut/core';
+import { useToast } from '../../hooks/useToast';
+import { LoadingOverlay } from '../Loading/Loading';
 import './ExportDialog.css';
 
 interface ExportDialogProps {
@@ -16,6 +18,7 @@ interface ExportDialogProps {
 export function ExportDialog({ onClose }: ExportDialogProps) {
   const project = useProjectStore((state) => state.project);
   const timeline = useTimelineStore((state) => state.timeline);
+  const toast = useToast();
 
   const [settings, setSettings] = useState<ExportSettings>({
     format: 'mp4',
@@ -57,6 +60,7 @@ export function ExportDialog({ onClose }: ExportDialogProps) {
     setExporting(true);
     setProgress(0);
     setError(null);
+    toast.info('Starting export...');
 
     try {
       // Render timeline with FFmpeg
@@ -82,14 +86,17 @@ export function ExportDialog({ onClose }: ExportDialogProps) {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
 
-        alert(`Export complete! Duration: ${(result.duration! / 1000).toFixed(1)}s`);
+        const duration = (result.duration! / 1000).toFixed(1);
+        toast.success(`Export complete! Duration: ${duration}s`);
         onClose();
       } else {
         throw new Error(result.error || 'Export failed');
       }
     } catch (err) {
       console.error('Export error:', err);
-      setError(err instanceof Error ? err.message : 'Export failed');
+      const errorMessage = err instanceof Error ? err.message : 'Export failed';
+      setError(errorMessage);
+      toast.error(`Export failed: ${errorMessage}`);
     } finally {
       setExporting(false);
     }
@@ -114,6 +121,13 @@ export function ExportDialog({ onClose }: ExportDialogProps) {
 
   return (
     <div className="export-dialog-overlay" onClick={onClose}>
+      {/* Loading Overlay */}
+      {exporting && (
+        <LoadingOverlay 
+          message={`Exporting video... ${progress}%`}
+        />
+      )}
+
       <div className="export-dialog" onClick={(e) => e.stopPropagation()}>
         <div className="export-dialog__header">
           <h2>Export Video</h2>

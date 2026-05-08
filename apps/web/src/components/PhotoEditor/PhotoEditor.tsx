@@ -4,6 +4,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useToast } from '../../hooks/useToast';
 import './PhotoEditor.css';
 
 interface PhotoAdjustment {
@@ -76,6 +77,7 @@ export function PhotoEditor() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const toast = useToast();
 
   /**
    * Update adjustment value
@@ -94,14 +96,19 @@ export function PhotoEditor() {
     setRotation(0);
     setFlipH(false);
     setFlipV(false);
-  }, []);
+    toast.success('All adjustments reset');
+  }, [toast]);
 
   /**
    * Apply filter
    */
   const applyFilter = useCallback((filterId: string) => {
     setSelectedFilter(filterId);
-  }, []);
+    const filter = PHOTO_FILTERS.find(f => f.id === filterId);
+    if (filter && filterId !== 'none') {
+      toast.success(`Applied ${filter.name} filter`);
+    }
+  }, [toast]);
 
   /**
    * Handle file upload
@@ -114,10 +121,16 @@ export function PhotoEditor() {
         const src = event.target?.result as string;
         setImageSrc(src);
         setHasImage(true);
+        toast.success('Image loaded successfully');
+      };
+      reader.onerror = () => {
+        toast.error('Failed to load image');
       };
       reader.readAsDataURL(file);
+    } else {
+      toast.error('Please select a valid image file');
     }
-  }, []);
+  }, [toast]);
 
   /**
    * Trigger file input
@@ -133,16 +146,22 @@ export function PhotoEditor() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
+    toast.info('Exporting image...');
+
     canvas.toBlob((blob) => {
-      if (!blob) return;
+      if (!blob) {
+        toast.error('Failed to export image');
+        return;
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = `edited-photo-${Date.now()}.png`;
       a.click();
       URL.revokeObjectURL(url);
+      toast.success('Image exported successfully!');
     });
-  }, []);
+  }, [toast]);
 
   /**
    * Draw image on canvas with adjustments

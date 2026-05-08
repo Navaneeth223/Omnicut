@@ -5,6 +5,8 @@
 import { useState, useCallback } from 'react';
 import { useMediaPoolStore, mediaPoolSelectors } from '@omnicut/store';
 import { createMediaImporter } from '@omnicut/media-engine';
+import { useToast } from '../../hooks/useToast';
+import { Spinner } from '../Loading/Loading';
 import { MediaGrid } from './MediaGrid';
 import { MediaList } from './MediaList';
 import { ImportDialog } from './ImportDialog';
@@ -16,6 +18,8 @@ export function MediaPool() {
   const [showImportDialog, setShowImportDialog] = useState(false);
   const [importing, setImporting] = useState(false);
   const [importProgress, setImportProgress] = useState({ current: 0, total: 0 });
+
+  const toast = useToast();
 
   const viewMode = useMediaPoolStore((state) => state.viewMode);
   const searchQuery = useMediaPoolStore((state) => state.searchQuery);
@@ -33,6 +37,7 @@ export function MediaPool() {
   const handleImport = useCallback(async (files: File[]) => {
     setImporting(true);
     setImportProgress({ current: 0, total: files.length });
+    toast.info(`Importing ${files.length} file${files.length > 1 ? 's' : ''}...`);
 
     try {
       const results = await mediaImporter.importFiles(
@@ -53,22 +58,29 @@ export function MediaPool() {
 
       if (successfulItems.length > 0) {
         addMediaItems(successfulItems);
+        toast.success(`Successfully imported ${successfulItems.length} file${successfulItems.length > 1 ? 's' : ''}!`);
       }
 
       // Show errors if any
       const errors = results.filter((result) => result.errors.length > 0);
       if (errors.length > 0) {
         console.error('Import errors:', errors);
-        // TODO: Show error toast
+        toast.error(`Failed to import ${errors.length} file${errors.length > 1 ? 's' : ''}`);
+      }
+
+      // If all failed
+      if (successfulItems.length === 0 && errors.length > 0) {
+        toast.error('All files failed to import');
       }
     } catch (error) {
       console.error('Import failed:', error);
-      // TODO: Show error toast
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Import failed: ${errorMessage}`);
     } finally {
       setImporting(false);
       setShowImportDialog(false);
     }
-  }, [addMediaItems]);
+  }, [addMediaItems, toast]);
 
   /**
    * Handle drag and drop
@@ -150,7 +162,7 @@ export function MediaPool() {
       <div className="media-pool__content">
         {importing ? (
           <div className="media-pool__importing">
-            <div className="spinner" />
+            <Spinner size="large" />
             <p>
               Importing {importProgress.current} of {importProgress.total}...
             </p>

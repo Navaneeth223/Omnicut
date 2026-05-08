@@ -7,6 +7,8 @@ import { useState, useCallback } from 'react';
 import { useTimelineStore, useMediaPoolStore, useProjectStore } from '@omnicut/store';
 import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
+import { useToast } from '../../hooks/useToast';
+import { LoadingOverlay } from '../Loading/Loading';
 import './ShortsStudio.css';
 
 interface ShortsTemplate {
@@ -75,6 +77,8 @@ export function ShortsStudio() {
   const [step, setStep] = useState<'type' | 'template' | 'content' | 'music' | 'preview'>('type');
   const [showImportDialog, setShowImportDialog] = useState(false);
 
+  const toast = useToast();
+
   const mediaItems = useMediaPoolStore((state) => state.mediaPool?.items ?? []);
   const addClip = useTimelineStore((state) => state.addClip);
   const addTransition = useTimelineStore((state) => state.addTransition);
@@ -96,6 +100,7 @@ export function ShortsStudio() {
     if (selectedContent.length === 0) return;
 
     setIsGenerating(true);
+    toast.info('Generating your shorts video...');
 
     try {
       // Step 1: Update project settings for shorts format
@@ -241,12 +246,15 @@ export function ShortsStudio() {
       setTimeout(() => {
         setIsGenerating(false);
         setStep('preview');
+        toast.success('Shorts video generated successfully!');
       }, 500);
     } catch (error) {
       console.error('Failed to generate shorts:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      toast.error(`Failed to generate shorts: ${errorMessage}`);
       setIsGenerating(false);
     }
-  }, [selectedTemplate, selectedImages, selectedVideos, selectedMusic, contentType, timeline, addClip, addTransition, updateClip, updateSettings]);
+  }, [selectedTemplate, selectedImages, selectedVideos, selectedMusic, contentType, timeline, addClip, addTransition, updateClip, updateSettings, toast]);
 
   /**
    * Handle file import
@@ -262,6 +270,7 @@ export function ShortsStudio() {
       if (!files) return;
 
       const addMediaItem = useMediaPoolStore.getState().addMediaItem;
+      let importedCount = 0;
       
       for (const file of Array.from(files)) {
         const item: MediaItem = {
@@ -279,13 +288,15 @@ export function ShortsStudio() {
         };
         
         addMediaItem(item);
+        importedCount++;
       }
       
+      toast.success(`Imported ${importedCount} ${contentType === 'image' ? 'image' : 'video'}${importedCount > 1 ? 's' : ''}!`);
       setShowImportDialog(false);
     };
     
     input.click();
-  }, [contentType]);
+  }, [contentType, toast]);
 
   /**
    * Reset wizard
@@ -301,6 +312,13 @@ export function ShortsStudio() {
 
   return (
     <div className="shorts-studio">
+      {/* Loading Overlay */}
+      {isGenerating && (
+        <LoadingOverlay 
+          message="Generating your shorts video..."
+        />
+      )}
+
       <div className="shorts-studio__header">
         <h2 className="shorts-studio__title">🎬 AI Shorts Studio</h2>
         <p className="shorts-studio__subtitle">
