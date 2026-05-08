@@ -109,9 +109,41 @@ export function AudioWorkspace() {
   const [appliedEffects, setAppliedEffects] = useState<AudioEffect[]>([]);
   const [showMeters, setShowMeters] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [audioFiles, setAudioFiles] = useState<Array<{ id: string; name: string; url: string }>>([]);
 
   const waveformRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const toast = useToast();
+
+  /**
+   * Handle audio file import
+   */
+  const handleFileImport = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    Array.from(files).forEach(file => {
+      if (file.type.startsWith('audio/')) {
+        const url = URL.createObjectURL(file);
+        const newFile = {
+          id: `${Date.now()}-${Math.random()}`,
+          name: file.name,
+          url,
+        };
+        setAudioFiles(prev => [...prev, newFile]);
+        toast.success(`Imported ${file.name}`);
+      } else {
+        toast.error(`${file.name} is not an audio file`);
+      }
+    });
+  }, [toast]);
+
+  /**
+   * Open file dialog
+   */
+  const openFileDialog = useCallback(() => {
+    fileInputRef.current?.click();
+  }, []);
 
   /**
    * Update track property
@@ -251,6 +283,16 @@ export function AudioWorkspace() {
 
   return (
     <div className="audio-workspace">
+      {/* Hidden file input */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="audio/*"
+        multiple
+        onChange={handleFileImport}
+        style={{ display: 'none' }}
+      />
+
       {/* Header */}
       <div className="audio-workspace__header">
         <div className="audio-workspace__title-section">
@@ -258,6 +300,9 @@ export function AudioWorkspace() {
           <p className="audio-workspace__subtitle">Professional audio editing and mixing</p>
         </div>
         <div className="audio-workspace__actions">
+          <button className="button button--secondary" onClick={openFileDialog}>
+            📁 Import Audio
+          </button>
           <button
             className={`button ${isPlaying ? 'button--danger' : 'button--primary'}`}
             onClick={() => setIsPlaying(!isPlaying)}
