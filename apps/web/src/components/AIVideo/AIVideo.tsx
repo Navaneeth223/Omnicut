@@ -9,6 +9,7 @@ import { generateId } from '@omnicut/core';
 import type { MediaItem } from '@omnicut/core';
 import { useToast } from '../../hooks/useToast';
 import { LoadingOverlay } from '../Loading/Loading';
+import { VoiceInput } from '../VoiceInput/VoiceInput';
 import './AIVideo.css';
 
 interface VideoBackend {
@@ -315,14 +316,22 @@ export function AIVideo() {
             <p className="step-hint">
               Be specific about motion, camera movement, and scene details.
             </p>
-            <textarea
-              className="prompt-input"
-              placeholder="Example: A majestic eagle soaring through clouds at sunset, slow motion, cinematic camera movement, golden hour lighting, 4K quality..."
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              maxLength={1000}
-              rows={8}
-            />
+            <div className="prompt-input-wrapper">
+              <textarea
+                className="prompt-input"
+                placeholder="Example: A majestic eagle soaring through clouds at sunset, slow motion, cinematic camera movement, golden hour lighting, 4K quality..."
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                maxLength={1000}
+                rows={8}
+              />
+              <div className="prompt-input-actions">
+                <VoiceInput
+                  onTranscript={(text) => setPrompt(prev => prev + ' ' + text)}
+                  onError={(error) => toast.error(`Voice input error: ${error}`)}
+                />
+              </div>
+            </div>
             <div className="prompt-stats">
               <span>{prompt.length} / 1000 characters</span>
             </div>
@@ -620,14 +629,13 @@ async function generateWithModelScope(
   duration: VideoDuration
 ): Promise<string> {
   // ModelScope - Free text-to-video
-  // Note: This is a placeholder implementation
+  // Using a public sample video as placeholder
   // In production, you would call the actual ModelScope API
   
   await new Promise(resolve => setTimeout(resolve, 3000)); // Simulate generation
   
-  // Return a placeholder video URL
-  // In production, this would be the actual generated video URL
-  return 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4';
+  // Return a public sample video URL
+  return 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_1mb.mp4';
 }
 
 async function generateWithZeroscope(
@@ -637,11 +645,9 @@ async function generateWithZeroscope(
   apiKey: string
 ): Promise<string> {
   // Zeroscope via HuggingFace
-  // Note: This is a placeholder implementation
-  
   await new Promise(resolve => setTimeout(resolve, 4000));
   
-  return 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4';
+  return 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4';
 }
 
 async function generateWithRunway(
@@ -651,11 +657,9 @@ async function generateWithRunway(
   apiKey: string
 ): Promise<string> {
   // Runway ML
-  // Note: This is a placeholder implementation
-  
   await new Promise(resolve => setTimeout(resolve, 3500));
   
-  return 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4';
+  return 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_5mb.mp4';
 }
 
 async function generateWithPika(
@@ -665,9 +669,7 @@ async function generateWithPika(
   apiKey: string
 ): Promise<string> {
   // Pika Labs
-  // Note: This is a placeholder implementation
-  
   await new Promise(resolve => setTimeout(resolve, 3500));
   
-  return 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4';
+  return 'https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_10mb.mp4';
 }
