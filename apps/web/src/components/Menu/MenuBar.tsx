@@ -11,9 +11,25 @@ interface MenuBarProps {
   onExport: () => void;
   onSettings: () => void;
   onImportMedia: () => void;
+  onToggleMediaPool?: () => void;
+  onToggleEffectsPanel?: () => void;
+  onToggleTimeline?: () => void;
+  showMediaPool?: boolean;
+  showEffectsPanel?: boolean;
+  showTimeline?: boolean;
 }
 
-export function MenuBar({ onExport, onSettings, onImportMedia }: MenuBarProps) {
+export function MenuBar({ 
+  onExport, 
+  onSettings, 
+  onImportMedia,
+  onToggleMediaPool,
+  onToggleEffectsPanel,
+  onToggleTimeline,
+  showMediaPool = true,
+  showEffectsPanel = true,
+  showTimeline = true,
+}: MenuBarProps) {
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -194,16 +210,16 @@ export function MenuBar({ onExport, onSettings, onImportMedia }: MenuBarProps) {
                 <span className="menu-option__shortcut">⌘-</span>
               </button>
               <div className="menu-separator" />
-              <button className="menu-option" onClick={() => handleMenuAction(() => {})}>
-                <span className="menu-option__label">Show Media Pool</span>
+              <button className="menu-option" onClick={() => handleMenuAction(() => onToggleMediaPool?.())}>
+                <span className="menu-option__label">{showMediaPool ? '✓ ' : ''}Media Pool</span>
                 <span className="menu-option__shortcut">⌘1</span>
               </button>
-              <button className="menu-option" onClick={() => handleMenuAction(() => {})}>
-                <span className="menu-option__label">Show Effects</span>
+              <button className="menu-option" onClick={() => handleMenuAction(() => onToggleEffectsPanel?.())}>
+                <span className="menu-option__label">{showEffectsPanel ? '✓ ' : ''}Effects Panel</span>
                 <span className="menu-option__shortcut">⌘2</span>
               </button>
-              <button className="menu-option" onClick={() => handleMenuAction(() => {})}>
-                <span className="menu-option__label">Show Timeline</span>
+              <button className="menu-option" onClick={() => handleMenuAction(() => onToggleTimeline?.())}>
+                <span className="menu-option__label">{showTimeline ? '✓ ' : ''}Timeline</span>
                 <span className="menu-option__shortcut">⌘3</span>
               </button>
             </div>

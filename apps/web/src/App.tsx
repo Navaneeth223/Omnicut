@@ -19,7 +19,6 @@ import { ToastContainer } from './components/Toast/Toast';
 import { KeyboardShortcutsDialog } from './components/KeyboardShortcuts/KeyboardShortcutsDialog';
 import { Loading } from './components/Loading/Loading';
 import { SkipNav } from './components/SkipNav/SkipNav';
-import { ResizeHandle } from './components/ResizeHandle/ResizeHandle';
 import { usePlayback } from './hooks/usePlayback';
 import { useKeyboardShortcuts } from './hooks/useKeyboardShortcuts';
 import { useAutoSave } from './hooks/useAutoSave';
@@ -270,6 +269,12 @@ function App() {
             };
             input.click();
           }}
+          onToggleMediaPool={() => setShowMediaPool(!showMediaPool)}
+          onToggleEffectsPanel={() => setShowRightPanel(!showRightPanel)}
+          onToggleTimeline={() => setShowTimeline(!showTimeline)}
+          showMediaPool={showMediaPool}
+          showEffectsPanel={showRightPanel}
+          showTimeline={showTimeline}
         />
       )}
 
@@ -294,7 +299,13 @@ function App() {
           <div className="layout">
           {/* Left Panel - Media Pool */}
           {showMediaPool && (
-            <aside className="panel panel--left" id="media-pool" role="complementary" aria-label="Media Pool">
+            <aside 
+              className="panel panel--left" 
+              id="media-pool" 
+              role="complementary" 
+              aria-label="Media Pool"
+              style={{ width: '280px', minWidth: '200px', maxWidth: '600px', position: 'relative' }}
+            >
               <div className="panel-header">
                 <h3 className="panel-title">Media Pool</h3>
                 <div className="panel-controls">
@@ -309,6 +320,34 @@ function App() {
                 </div>
               </div>
               <MediaPool />
+              {/* Resize handle on right edge */}
+              <div
+                className="panel-resize-handle panel-resize-handle--right"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  const startX = e.clientX;
+                  const panel = e.currentTarget.parentElement as HTMLElement;
+                  const startWidth = panel.offsetWidth;
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const delta = e.clientX - startX;
+                    const newWidth = Math.max(200, Math.min(600, startWidth + delta));
+                    panel.style.width = `${newWidth}px`;
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                  document.body.style.cursor = 'ew-resize';
+                  document.body.style.userSelect = 'none';
+                }}
+              />
             </aside>
           )}
 
@@ -370,6 +409,7 @@ function App() {
             </div>
 
             {/* Timeline */}
+            {showTimeline && (
             <div className="timeline-container" id="timeline" role="region" aria-label="Timeline Editor">
               <div className="timeline-toolbar" role="toolbar" aria-label="Timeline Tools">
                 <div className="timeline-toolbar__left">
@@ -398,7 +438,10 @@ function App() {
                 <div className="timeline-toolbar__center">
                   <button
                     className="icon-button"
-                    onClick={() => useTimelineStore.getState().zoomOut()}
+                    onClick={() => {
+                      const currentZoom = useTimelineStore.getState().zoomLevel;
+                      useTimelineStore.getState().setZoomLevel(Math.max(10, currentZoom - 50));
+                    }}
                     title="Zoom out (-)"
                   >
                     -
@@ -416,7 +459,10 @@ function App() {
                   />
                   <button
                     className="icon-button"
-                    onClick={() => useTimelineStore.getState().zoomIn()}
+                    onClick={() => {
+                      const currentZoom = useTimelineStore.getState().zoomLevel;
+                      useTimelineStore.getState().setZoomLevel(Math.min(1000, currentZoom + 50));
+                    }}
                     title="Zoom in (+)"
                   >
                     +
@@ -443,6 +489,7 @@ function App() {
               </div>
               <Timeline />
             </div>
+            )}
           </div>
 
           {/* Right Panel - Effects & Transitions */}
@@ -451,16 +498,36 @@ function App() {
               className="panel panel--right" 
               role="complementary" 
               aria-label="Effects and Transitions"
-              style={{ width: `${rightPanelWidth}px` }}
+              style={{ width: `${rightPanelWidth}px`, minWidth: '280px', maxWidth: '500px', position: 'relative' }}
             >
-              {/* Resize Handle */}
-              <ResizeHandle
-                panelId="right-panel"
-                direction="horizontal"
-                side="left"
-                onResize={handleRightPanelResize}
-                minSize={280}
-                maxSize={500}
+              {/* Resize Handle on left edge */}
+              <div
+                className="panel-resize-handle panel-resize-handle--left"
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  const startX = e.clientX;
+                  const panel = e.currentTarget.parentElement as HTMLElement;
+                  const startWidth = panel.offsetWidth;
+                  
+                  const handleMouseMove = (e: MouseEvent) => {
+                    const delta = startX - e.clientX; // Reversed for left handle
+                    const newWidth = Math.max(280, Math.min(500, startWidth + delta));
+                    setRightPanelWidth(newWidth);
+                    localStorage.setItem('rightPanelWidth', newWidth.toString());
+                  };
+                  
+                  const handleMouseUp = () => {
+                    document.removeEventListener('mousemove', handleMouseMove);
+                    document.removeEventListener('mouseup', handleMouseUp);
+                    document.body.style.cursor = '';
+                    document.body.style.userSelect = '';
+                  };
+                  
+                  document.addEventListener('mousemove', handleMouseMove);
+                  document.addEventListener('mouseup', handleMouseUp);
+                  document.body.style.cursor = 'ew-resize';
+                  document.body.style.userSelect = 'none';
+                }}
               />
               <div className="panel__header">
                 <div className="panel__tabs">

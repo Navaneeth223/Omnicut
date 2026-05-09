@@ -11,8 +11,10 @@ import './VideoViewer.css';
 
 export function VideoViewer() {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const effectRendererRef = useRef(createEffectPreviewRenderer());
+  const audioContextRef = useRef<AudioContext | null>(null);
   const [currentMedia, setCurrentMedia] = useState<string | null>(null);
   const [mediaType, setMediaType] = useState<'video' | 'audio' | 'image' | null>(null);
 
@@ -70,27 +72,58 @@ export function VideoViewer() {
    */
   useEffect(() => {
     const video = videoRef.current;
-    if (!video || mediaType !== 'video') return;
+    const audio = audioRef.current;
+    
+    if (mediaType === 'video' && video) {
+      const clip = getCurrentClip();
+      if (!clip) return;
 
-    const clip = getCurrentClip();
-    if (!clip) return;
+      // Calculate time within clip
+      const timeInClip = playhead - clip.startTime;
+      const videoTime = clip.trimStart + timeInClip;
 
-    // Calculate time within clip
-    const timeInClip = playhead - clip.startTime;
-    const videoTime = clip.trimStart + timeInClip;
+      // Sync video time
+      if (Math.abs(video.currentTime - videoTime) > 0.1) {
+        video.currentTime = videoTime;
+      }
 
-    // Sync video time
-    if (Math.abs(video.currentTime - videoTime) > 0.1) {
-      video.currentTime = videoTime;
-    }
+      // Enable audio for video
+      video.muted = false;
+      video.volume = 1.0;
 
-    // Sync play/pause
-    if (playing && video.paused) {
-      video.play().catch(() => {
-        // Ignore play errors
-      });
-    } else if (!playing && !video.paused) {
-      video.pause();
+      // Sync play/pause
+      if (playing && video.paused) {
+        video.play().catch((err) => {
+          console.error('Video play error:', err);
+        });
+      } else if (!playing && !video.paused) {
+        video.pause();
+      }
+    } else if (mediaType === 'audio' && audio) {
+      const clip = getCurrentClip();
+      if (!clip) return;
+
+      // Calculate time within clip
+      const timeInClip = playhead - clip.startTime;
+      const audioTime = clip.trimStart + timeInClip;
+
+      // Sync audio time
+      if (Math.abs(audio.currentTime - audioTime) > 0.1) {
+        audio.currentTime = audioTime;
+      }
+
+      // Enable audio
+      audio.muted = false;
+      audio.volume = 1.0;
+
+      // Sync play/pause
+      if (playing && audio.paused) {
+        audio.play().catch((err) => {
+          console.error('Audio play error:', err);
+        });
+      } else if (!playing && !audio.paused) {
+        audio.pause();
+      }
     }
   }, [playhead, playing, mediaType]);
 
@@ -144,7 +177,7 @@ export function VideoViewer() {
                 src={currentMedia}
                 className="video-viewer__video"
                 style={{ display: 'none' }}
-                muted
+                crossOrigin="anonymous"
               />
               <canvas
                 ref={canvasRef}
@@ -166,11 +199,13 @@ export function VideoViewer() {
               <div className="audio-visualizer">
                 <div className="audio-visualizer__icon">🎵</div>
                 <p className="audio-visualizer__text">Audio Track</p>
+                <p className="audio-visualizer__hint">Playing audio...</p>
               </div>
               <audio
-                ref={videoRef as any}
+                ref={audioRef}
                 src={currentMedia}
                 style={{ display: 'none' }}
+                crossOrigin="anonymous"
               />
             </div>
           )}

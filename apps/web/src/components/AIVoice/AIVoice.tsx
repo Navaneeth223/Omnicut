@@ -471,7 +471,19 @@ export function AIVoice() {
 
       {/* Info Panel */}
       <div className="ai-voice__info">
-        <h4>💡 Pro Tips</h4>
+        <div className="info-panel-header">
+          <h4>💡 Pro Tips</h4>
+          <button
+            className="info-close-btn"
+            onClick={() => {
+              const infoPanel = document.querySelector('.ai-voice__info') as HTMLElement;
+              if (infoPanel) infoPanel.style.display = 'none';
+            }}
+            title="Close"
+          >
+            ✕
+          </button>
+        </div>
         <ul>
           <li>Use punctuation for natural pauses</li>
           <li>Write in a conversational tone</li>

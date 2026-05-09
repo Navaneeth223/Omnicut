@@ -589,6 +589,43 @@
   border-radius: var(--radius-lg);
   padding: var(--sp-4);
   margin-top: var(--sp-6);
+  position: relative;
+}
+
+.info-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--sp-3);
+}
+
+.info-panel-header h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.info-close-btn {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast);
+  font-size: 14px;
+  padding: 0;
+}
+
+.info-close-btn:hover {
+  background: var(--bg-hover);
+  border-color: var(--border-normal);
+  color: var(--text-primary);
 }
 
 .ai-image__info h4 {

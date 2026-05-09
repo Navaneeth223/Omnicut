@@ -175,9 +175,12 @@ export function PhotoEditor() {
 
     const img = new Image();
     img.onload = () => {
-      // Set canvas size
+      // Set canvas size to match image
       canvas.width = img.width;
       canvas.height = img.height;
+
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
       // Apply transformations
       ctx.save();
@@ -186,10 +189,7 @@ export function PhotoEditor() {
       ctx.scale(flipH ? -1 : 1, flipV ? -1 : 1);
       ctx.translate(-canvas.width / 2, -canvas.height / 2);
 
-      // Draw image
-      ctx.drawImage(img, 0, 0);
-
-      // Apply adjustments using filters
+      // Build CSS filter string
       const filters: string[] = [];
       
       if (adjustments.brightness !== 0) {
@@ -201,12 +201,59 @@ export function PhotoEditor() {
       if (adjustments.saturation !== 0) {
         filters.push(`saturate(${100 + adjustments.saturation}%)`);
       }
+      if (adjustments.exposure !== 0) {
+        filters.push(`brightness(${100 + adjustments.exposure}%)`);
+      }
+      if (adjustments.sharpness > 0) {
+        filters.push(`contrast(${100 + adjustments.sharpness / 2}%)`);
+      }
       
-      ctx.filter = filters.join(' ') || 'none';
+      // Apply filter based on selected filter
+      if (selectedFilter === 'mono') {
+        filters.push('grayscale(100%)');
+      } else if (selectedFilter === 'sepia') {
+        filters.push('sepia(100%)');
+      } else if (selectedFilter === 'vivid') {
+        filters.push('saturate(150%)');
+        filters.push('contrast(110%)');
+      } else if (selectedFilter === 'dramatic') {
+        filters.push('contrast(150%)');
+        filters.push('saturate(120%)');
+      } else if (selectedFilter === 'vintage') {
+        filters.push('sepia(50%)');
+        filters.push('contrast(90%)');
+      } else if (selectedFilter === 'warm') {
+        filters.push('sepia(30%)');
+        filters.push('saturate(120%)');
+      } else if (selectedFilter === 'cool') {
+        filters.push('hue-rotate(180deg)');
+        filters.push('saturate(110%)');
+      } else if (selectedFilter === 'fade') {
+        filters.push('contrast(80%)');
+        filters.push('brightness(110%)');
+      } else if (selectedFilter === 'sharpen') {
+        filters.push('contrast(120%)');
+      }
+      
+      // Apply filter intensity
+      if (selectedFilter !== 'none' && filterIntensity < 100) {
+        // This is a simplified approach - proper implementation would blend
+        ctx.globalAlpha = filterIntensity / 100;
+      }
+
+      // Apply all filters
+      ctx.filter = filters.length > 0 ? filters.join(' ') : 'none';
+
+      // Draw image
+      ctx.drawImage(img, 0, 0);
+
       ctx.restore();
     };
+    img.onerror = () => {
+      toast.error('Failed to load image');
+    };
     img.src = imageSrc;
-  }, [imageSrc, adjustments, rotation, flipH, flipV]);
+  }, [imageSrc, adjustments, rotation, flipH, flipV, selectedFilter, filterIntensity, toast]);
 
   return (
     <div className="photo-editor">

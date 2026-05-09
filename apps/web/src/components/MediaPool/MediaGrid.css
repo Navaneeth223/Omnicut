@@ -4,9 +4,29 @@
 
 .media-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
   gap: var(--space-3);
   padding: var(--space-2);
+  width: 100%;
+}
+
+/* Responsive grid based on container width */
+@container (max-width: 300px) {
+  .media-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@container (min-width: 301px) and (max-width: 500px) {
+  .media-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@container (min-width: 501px) {
+  .media-grid {
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  }
 }
 
 .media-grid__item {

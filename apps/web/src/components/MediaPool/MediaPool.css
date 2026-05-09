@@ -12,6 +12,8 @@
   min-width: 200px;
   max-width: 600px;
   transition: width 0.1s ease-out;
+  container-type: inline-size;
+  container-name: media-pool;
 }
 
 /* Header */

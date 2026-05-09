@@ -602,7 +602,19 @@ export function AIImage() {
 
       {/* Info Panel */}
       <div className="ai-image__info">
-        <h4>💡 Pro Tips</h4>
+        <div className="info-panel-header">
+          <h4>💡 Pro Tips</h4>
+          <button
+            className="info-close-btn"
+            onClick={() => {
+              const infoPanel = document.querySelector('.ai-image__info') as HTMLElement;
+              if (infoPanel) infoPanel.style.display = 'none';
+            }}
+            title="Close"
+          >
+            ✕
+          </button>
+        </div>
         <ul>
           <li>Be specific and descriptive in your prompts</li>
           <li>Include art style (e.g., "digital art", "oil painting")</li>

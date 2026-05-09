@@ -98,15 +98,39 @@
   text-transform: uppercase;
 }
 
-/* Applied Effects Section - Make properly scrollable */
+/* Applied Effects Section - Make properly scrollable with resizable divider */
 .effects-panel__applied {
-  flex: 1;
+  flex-shrink: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: var(--sp-4);
   border-top: 1px solid var(--border-faint);
-  min-height: 0; /* Important for flex scrolling */
-  max-height: 50%; /* Limit to half the panel */
+  min-height: 150px;
+  max-height: none;
+  position: relative;
+}
+
+/* Resize handle for applied effects section */
+.effects-panel__applied-resize {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  cursor: ns-resize;
+  background: transparent;
+  z-index: 10;
+  transition: background var(--duration-fast);
+}
+
+.effects-panel__applied-resize:hover {
+  background: var(--accent-1);
+  opacity: 0.3;
+}
+
+.effects-panel__applied-resize:active {
+  background: var(--accent-1);
+  opacity: 0.5;
 }
 
 /* No Selection State */

@@ -21,13 +21,13 @@ export function ExportDialog({ onClose }: ExportDialogProps) {
   const toast = useToast();
 
   const [settings, setSettings] = useState<ExportSettings>({
-    format: 'mp4',
-    codec: 'h264',
+    format: 'webm',
+    codec: 'vp9',
     resolution: project?.settings.resolution || { width: 1920, height: 1080 },
     frameRate: project?.settings.frameRate || 30,
     bitrate: 8000,
     quality: 'high',
-    audioCodec: 'aac',
+    audioCodec: 'opus',
     audioBitrate: 192,
     startTime: 0,
     endTime: timeline?.duration || 0,
@@ -105,18 +105,34 @@ export function ExportDialog({ onClose }: ExportDialogProps) {
   const estimatedFileSize = () => {
     if (!timeline) return '0.00';
     
-    const sizeInBytes = estimateFileSize(timeline, {
-      format: settings.format,
-      codec: settings.codec,
-      resolution: settings.resolution,
-      frameRate: settings.frameRate,
-      quality: settings.quality,
-      audioBitrate: settings.audioBitrate,
-      videoBitrate: settings.bitrate,
-    });
+    // Calculate duration
+    const duration = settings.endTime - settings.startTime;
+    
+    // Calculate size based on bitrates
+    const videoBitrate = settings.bitrate || getDefaultVideoBitrate(settings.quality);
+    const audioBitrate = settings.audioBitrate;
+    
+    // Size in bytes = (video bitrate + audio bitrate) * duration / 8
+    // Bitrates are in kbps, so multiply by 1000 to get bps
+    const sizeInBytes = ((videoBitrate + audioBitrate) * 1000 * duration) / 8;
     
     const sizeInMB = sizeInBytes / (1024 * 1024);
     return sizeInMB.toFixed(2);
+  };
+  
+  const getDefaultVideoBitrate = (quality: string): number => {
+    switch (quality) {
+      case 'low':
+        return 1000;
+      case 'medium':
+        return 2500;
+      case 'high':
+        return 5000;
+      case 'ultra':
+        return 10000;
+      default:
+        return 2500;
+    }
   };
 
   return (
