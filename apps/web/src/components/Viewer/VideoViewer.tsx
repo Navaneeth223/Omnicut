@@ -128,33 +128,44 @@ export function VideoViewer() {
   }, [playhead, playing, mediaType]);
 
   /**
-   * Render to canvas with effects
+   * Render video to canvas (simple 2D rendering)
    */
   useEffect(() => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
     
     if (!canvas || !video || mediaType !== 'video') {
-      effectRendererRef.current.stop();
       return;
     }
 
-    const clip = getCurrentClip();
-    if (!clip) {
-      effectRendererRef.current.stop();
-      return;
-    }
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    // Get effects for current clip
-    const effects = clip.effects || [];
+    let animationId: number;
+    
+    const render = () => {
+      if (video.readyState >= 2) {
+        // Set canvas size to match video
+        if (canvas.width !== video.videoWidth || canvas.height !== video.videoHeight) {
+          canvas.width = video.videoWidth || 1920;
+          canvas.height = video.videoHeight || 1080;
+        }
 
-    // Start effect rendering
-    effectRendererRef.current.start(video, canvas, effects);
+        // Draw video frame
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      }
+
+      animationId = requestAnimationFrame(render);
+    };
+
+    render();
 
     return () => {
-      effectRendererRef.current.stop();
+      if (animationId) {
+        cancelAnimationFrame(animationId);
+      }
     };
-  }, [playhead, mediaType, currentMedia, timeline]);
+  }, [mediaType, currentMedia]);
 
   return (
     <div className="video-viewer">
